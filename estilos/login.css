@@ -1,0 +1,128 @@
+* {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    text-decoration: none;
+    list-style: none;
+    box-sizing: border-box;
+}
+:root {
+    --cor-primaria: #3b82f6;
+    --cor-secundaria: #f4f4f4;
+    --cor-terciaria: #ffffff;
+    --cor-black: #000000;
+    --cor-acao-botao: #0056b3;
+    --font-principal: 'Inter', sans-serif;
+    --font-secundaria:  'Raleway', sans-serif;
+}
+
+body {
+    height: 100vh;
+
+}
+
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: var(--cor-primaria);
+}
+
+.conteiner__principal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.login-container {
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    width: 300px;
+    height: 400px;
+    text-align: center;
+}
+
+h1 {
+    margin-bottom: 20px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+.input-container {
+    display: flex;
+    align-items: center;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 8px;
+    margin: 10px 0;
+    box-shadow: 2px 3px 8px #00000015;
+}
+
+.input-container i {
+    margin-right: 8px;
+    color: #555;
+}
+
+.input-container input {
+    border: none;
+    outline: none;
+    width: 100%;
+    padding: 5px;
+}
+
+button {
+    background-color: var(--cor-primaria);
+    color: #fff;
+    padding: 12px 0;
+    margin: 15px 0;
+    border-radius: 10px;
+    box-shadow: 2px 3px 8px #00000015;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: var(--cor-acao-botao);
+}
+
+p, a {
+   font-size: 1em;
+}
+
+p a {
+    font-weight: bolder;
+    color: var(--cor-primaria);
+    text-decoration: underline;
+}
+
+p a:active {
+    color: var(--cor-acao-botao);
+}
+
+/* Mensagem de erro */
+.error-message {
+    color: red;
+    font-size: 14px;
+    display: none;
+}
+
+
+/* Estiliza a div ao redor do input quando há erro */
+.input-container.input-error {
+    border: 2px solid red !important;
+    border-radius: 4px;
+}
+
+.imagem {
+    display: none;
+}
