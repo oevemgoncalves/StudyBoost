@@ -1,0 +1,95 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+@import url('https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    box-sizing: border-box;
+}
+
+:root {
+    --cor-primaria: #3b82f6;
+    --cor-secundaria: #f4f4f4;
+    --cor-terciaria: #ffffff;
+    --cor-black: #000000;
+    --cor-acao-botao: #0056b3;
+    --font-principal: 'Inter', sans-serif;
+    --font-secundaria:  'Raleway', sans-serif;
+}
+
+body {
+    height: 100vh;
+    display: flex;
+}
+
+.sidebar {
+    display: flex;
+    flex-flow: column nowrap;
+    background-color: var(--cor-primaria);
+    width: 270px;
+}
+
+.imagem {
+    display: flex;
+    align-items: center;
+    align-self: center;
+
+}
+
+.imagem img {
+    width: 70px;
+}
+
+.nome__logo {
+    font-family: var(--font-principal);
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.container__sidebar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.modal {
+    display: flex;
+    flex-flow: column nowrap;
+    background-color: var(--cor-terciaria);
+    height: 257px;
+    width: 512px;
+    border: 1px solid #000;
+}
+
+.input__new__folder {
+    margin-top: 30px;
+    text-align: center;
+}
+
+#nomePasta {
+    height: 49px;
+    width: 465px;
+}
+
+.criar-btn {
+    background-color: #d9d9d9;
+    margin: auto;
+    height: 49px;
+    width: 465px;
+    border-radius: 8px;
+    border: 1px solid #000000;
+}
+ .modal > i {
+    display: flex;
+    justify-content: flex-end;
+    background-color: antiquewhite;
+    padding: 15px;
+ }

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="estilo-dash/style.css" media="all">
+    <title>Dashboard</title>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="imagem">
+            <img src="imagem-dash/logo.png" alt="logo">
+            <span class="nome__logo">StudyBoost</span>
+        </div>
+        <div>
+            <i class="fa-solid fa-folder"></i>
+            <span>Pasta</span>
+        </div>
+        <div id="folder-container"></div>
+        <button onclick="novaPasta()">criar nova pasta</button>
+    </div>
+    <!--modal-->
+    <div id="modal" class="container__sidebar">
+        <div class="modal">
+            <i class="fa-solid fa-xmark"></i>
+            <h2>Criar nova pasta</h2>
+            <p>crie nova pasta para organizar suas anotações</p>
+            <div class="input__new__folder">
+                <p>Nome da pasta</p>
+                <input type="text" id="nomePasta">
+            </div>
+            <br><br>
+            <button class="criar-btn" onclick="criarPasta()">Criar pasta</button>
+            <!-- <button class="fechar-btn" onclick="fecharPasta()">Cancelar</button> -->
+        </div>
+    </div>
+
+    <main id="main">
+        <div class="cabecalho">
+            <i class="fa-regular fa-folder-open"></i>
+            <span>Todas as notas</span>
+            <i class="fa-solid fa-chevron-right"></i>
+            <span>Minhas anotações</span>
+        </div>
+
+        <h2>Nova pasta</h2>
+        <p class="texto">Anote seus pensamentos, ideias e tarefas. Além disso, você pode adicionar outras informações</p>
+        <button>Baixar PDF</button>
+        <div id="folder__content__container">
+            <p class="texto">Selecione uma pasta para adicionar conteúdo</p>
+        </div>
+    </main>
+
+    <script src="script-dash/script.js"></script>
+</body>
+</html>
