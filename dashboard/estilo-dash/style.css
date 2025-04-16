@@ -75,14 +75,14 @@ body {
 }
 
 #nomePasta {
-    height: 49px;
+    height: 40px;
     width: 465px;
 }
 
 .criar-btn {
     background-color: #d9d9d9;
     margin: auto;
-    height: 49px;
+    height: 40px;
     width: 465px;
     border-radius: 8px;
     border: 1px solid #000000;
