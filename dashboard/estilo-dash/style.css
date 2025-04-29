@@ -24,8 +24,15 @@ body {
     display: flex;
 }
 
+
+.cabecalho {
+    display: inline;
+    margin-left: 10px;
+}
+
+
 .sidebar {
-    display: flex;
+    display: none;
     flex-flow: column nowrap;
     background-color: var(--cor-primaria);
     width: 270px;
@@ -49,6 +56,7 @@ body {
 }
 
 .container__sidebar {
+    background: rgba(0, 0, 0, 0.5);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -57,17 +65,31 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5); 
+    z-index: 1000;
 }
 
 .modal {
     display: flex;
-    flex-flow: column nowrap;
+    flex-direction: column;
+    position: relative;
     background-color: var(--cor-terciaria);
-    height: 300px;
-    width: 512px;
+    width: 90%;
+    max-width: 512px;
+    padding: 20px;
     border: 1px solid #000;
-    border-radius: 10px 10px;
+    border-radius: 10px;
+    box-sizing: border-box;
+    opacity: 0;
+    transform: translateY(-20px);
+    animation: slideDown 0.5s ease forwards;
+}
+
+.txt__modal {
+    margin-left: 10px;
+}
+
+.modal > .text {
+    color: #0000006f;
 }
 
 .input__new__folder {
@@ -75,18 +97,25 @@ body {
     text-align: center;
 }
 
+.modal > .input__new__folder p {
+    text-align: left;
+    margin-left: 10px;
+    margin-bottom: 5px;
+}
+
 #nomePasta {
     height: 40px;
-    width: 465px;
+    width: 100%;
     border-radius: 8px;
     border: 1px solid #000000;
+    box-sizing: border-box;
 }
 
 .criar-btn {
     background-color: #d9d9d9;
     margin: 0 auto 30px;
     height: 40px;
-    width: 465px;
+    width: 100%;
     border-radius: 8px;
     border: 1px solid #000000;
 }
@@ -94,9 +123,65 @@ body {
     background-color: #ababab;
 }
 
- .modal > i {
+.modal > i {
     display: flex;
     justify-content: flex-end;
-    padding: 15px;
-    border-radius: 20px;
- }
+    align-self: flex-end;
+    cursor: pointer;
+    padding: 5px;
+    font-size: 24px;
+}
+
+/*telas menores*/
+@media (max-width: 600px) {
+    .modal {
+        padding: 15px;
+        height: auto; /* deixa a altura automática conforme o conteúdo */
+    }
+
+    .txt__modal {
+        font-size: 18px;
+        margin-left: 5px;
+        text-align: center;
+    }
+
+    .modal > .input__new__folder p {
+        margin-left: 5px;
+        font-size: 16px;
+    }
+
+    #nomePasta {
+        height: 35px;
+        font-size: 16px;
+    }
+
+    .criar-btn {
+        height: 40px;
+        font-size: 16px;
+    }
+
+    .modal > i {
+        font-size: 28px;
+        padding: 10px;
+    }
+}
+
+.hidden {
+    display: none;
+}
+
+
+.container__sidebar.active {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+}
+
+
+/* Animação suave no abrir */
+@keyframes slideDown {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

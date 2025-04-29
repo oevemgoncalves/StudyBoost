@@ -21,11 +21,11 @@
         <button onclick="novaPasta()">criar nova pasta</button>
     </div>
     <!--modal-->
-    <div id="modal" class="container__sidebar">
+    <div id="modal" class="container__sidebar hidden">
         <div class="modal">
-            <i class="fa-solid fa-xmark"></i>
-            <h2>Criar nova pasta</h2>
-            <p>crie nova pasta para organizar suas anotações</p>
+            <i class="fa-solid fa-xmark" onclick="fecharModal()"></i>
+            <h2 class="txt__modal">Criar nova pasta</h2>
+            <p class="txt__modal text">crie nova pasta para organizar suas anotações</p>
             <div class="input__new__folder">
                 <p>Nome da pasta</p>
                 <input type="text" id="nomePasta">
@@ -37,6 +37,10 @@
     </div>
 
     <main id="main">
+        <div class="cabecalho">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+        </div>
+
         <div class="cabecalho">
             <i class="fa-regular fa-folder-open"></i>
             <span>Todas as notas</span>
