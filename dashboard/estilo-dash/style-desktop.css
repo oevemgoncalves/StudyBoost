@@ -1,0 +1,21 @@
+@media (min-width: 769px) {
+    .sidebar {
+        transform: translateX(0); /* Garantir que a sidebar esteja visível */
+        position: fixed; /* Mantém a sidebar fixa na tela */
+        top: 0;
+        left: 0;
+        min-width: 350px; /* Largura mínima */
+        max-width: 350px; /* Largura máxima */
+        height: 100%; /* Garantir que ocupe toda a altura da tela */
+    }
+
+    .toggle-arrow {
+        display: none; /* Esconde o botão de toggle no desktop */
+    }
+
+
+    .container__principal {
+        margin-left: 350px; /* mesma largura da sidebar */
+        padding: 10px; /* opcional: para afastar o conteúdo da borda */
+    }    
+}

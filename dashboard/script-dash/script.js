@@ -13,3 +13,17 @@ function fecharModal() {
         modal.classList.add('hidden');
     }, 300); // Tempo igual ao transition de 0.3s
 }
+
+//seta da sidebar
+const sidebar = document.querySelector('.sidebar');
+const arrow = document.getElementById('toggleArrow');
+
+function toggleSidebar() {
+  sidebar.classList.toggle('open');
+
+  arrow.innerHTML = sidebar.classList.contains('open')
+    ? '<i class="fa-regular fa-square-caret-left"></i>'
+    : '<i class="fa-regular fa-square-caret-right"></i>';
+}
+
+  
