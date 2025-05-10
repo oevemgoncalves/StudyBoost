@@ -19,10 +19,9 @@
     --font-secundaria:  'Raleway', sans-serif;
 }
 
-body {
-    height: 100vh;
-    display: flex;
-    font-family: Arial, Helvetica, sans-serif;
+body.modal-open {
+    font-family: var(--font-principal);
+    overflow: hidden;
 }
 
 
@@ -49,9 +48,13 @@ body {
     transform: translateX(-100%); /*oculta sidebar mobile*/
 }
 
+.sidebar.open {
+    transform: translateX(0);
+}
+
 /*botao*/
 .toggle-arrow {
-    position: fixed;
+    position: absolute;
     top: 25px;
     left: 20px;
     font-size: 1.3em;
@@ -60,21 +63,19 @@ body {
     cursor: pointer;
     transition: left 0.3s ease;
     border: none;
+    border-radius: 8px;
     outline: none;
     height: 30px;
     width: 30px;
     padding: 0;
-  }
-
-/*novas atualizações*/
-.sidebar.open {
-    transform: translateX(0);
 }
 
-/*novas atualizações*/
-/* Quando a sidebar estiver aberta, seta vai pra dentro */
+/* Quando a sidebar estiver aberta, seta vai pra dentro*/
 .sidebar.open ~ .toggle-arrow {
+    position: fixed;
+    top: 20px;
     left: 280px; /* um pouco dentro da sidebar (320 - botão) */
+    z-index: 1001;
 }
 
 .imagem {
@@ -93,6 +94,16 @@ body {
     font-weight: bold;
 }
 
+.btn__criar-nova-pasta {
+    background-color: var(--cor-terciaria);
+    height: 30px;
+    margin-top: 5px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/*modal*/
 .container__modal {
     background: rgba(0, 0, 0, 0.5);
     display: flex;
@@ -106,11 +117,19 @@ body {
     z-index: 1000;
 }
 
+/*desativa/seta/modal estiver aberto*/
+#modal:not(.hidden) ~ .toggle-arrow {
+    pointer-events: none; /*desativa clique*/
+    opacity: 0.4;
+    cursor: default;
+}
+
 .modal {
     display: flex;
     flex-direction: column;
     position: relative;
     background-color: var(--cor-terciaria);
+    font-family: var(--font-principal);
     width: 90%;
     max-width: 512px;
     padding: 20px;
@@ -139,6 +158,7 @@ body {
     text-align: left;
     margin-left: 10px;
     margin-bottom: 5px;
+    
 }
 
 #nomePasta {
@@ -147,6 +167,8 @@ body {
     border-radius: 8px;
     border: 1px solid #000000;
     box-sizing: border-box;
+    outline: none;
+    padding-left: 12px;
 }
 
 .criar-btn {
@@ -156,6 +178,7 @@ body {
     width: 100%;
     border-radius: 8px;
     border: 1px solid #000000;
+    cursor: pointer;
 }
 .criar-btn:hover {
     background-color: #ababab;
@@ -223,8 +246,10 @@ body {
     }
 }
 
+/*conteúdo principal*/
 .container__principal {
     margin: 25px 15px 0 15px;
+    font-family: var(--font-principal);
 }
 
 .container__main__conteudo {

@@ -10,7 +10,7 @@
 </head>
 <body>
 
-    <!--sidebar-->
+    <!--sidebar/ menu lateral-->
     <div class="sidebar">
         <div class="imagem">
             <img src="imagem-dash/logo.png" alt="logo">
@@ -21,27 +21,30 @@
             <span>Pasta</span>
         </div>
         <div id="folder-container"></div>
-        <button onclick="novaPasta()">criar nova pasta</button>
+        <button class="btn__criar-nova-pasta" onclick="novaPasta()">criar nova pasta</button>
     </div>
     
     <!--modal-->
     <div id="modal" class="container__modal hidden">
         <div class="modal">
-            <i class="fa-solid fa-xmark" onclick="fecharModal()"></i>
+            <i class="fa-solid fa-xmark" onclick="fecharModal()" aria-label="Fechar modal"></i>
             <h2 class="txt__modal">Criar nova pasta</h2>
             <p class="txt__modal text">crie nova pasta para organizar suas anotações</p>
             <div class="input__new__folder">
                 <p>Nome da pasta</p>
-                <input type="text" id="nomePasta">
+                <input type="text" id="nomePasta" placeholder="Digite o nome da pasta">
             </div>
             <br>
-            <button class="criar-btn" onclick="criarPasta()">Criar pasta</button>
+            <button aria-label="Criar nova pasta" class="criar-btn" onclick="criarPasta()">Criar pasta</button>
         </div>
     </div>
 
     <!--botão seta (apenas visível apenas no mobile)-->
-    <button class="toggle-arrow" id="toggleArrow" onclick="toggleSidebar()"><i class="fa-regular fa-square-caret-right"></i></button>
+         <button class="toggle-arrow" id="toggleArrow"   onclick="toggleSidebar()" arial-label="Abrir/Fechar     menu lateral">
+            <i class="fa-regular fa-square-caret-right"></i>
+        </button>
 
+    <!--Conteudo principal-->
     <main class="container__principal" id="main">
         <div class="cabecalho">
             <i class="fa-regular fa-folder-open"></i>
