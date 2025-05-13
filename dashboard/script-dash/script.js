@@ -17,7 +17,7 @@ function novaPasta() {
 
     setTimeout(() => {
         modal.classList.add('active');
-        document.getElementById('nomePasta').focus();
+        document.getElementById('pastaNome').focus();
     }, 10); // Pequeno delay para o transition funcionar
 }
 
@@ -43,11 +43,11 @@ function criarPasta() {
     let folder = document.createElement("div") //criando div
     folder.className = "folder"; //add classe a pasta
 
-    let folderIcon = document.createElement("i");
+    let folderIcon = document.createElement("i"); //criando icone
     folderIcon.className = "fa-regular fa-folder-open";
 
     let folderTitle = document.createElement("span");
-    folderTitle.textContent = folderName;
+    folderTitle.textContent = folderName; //add nome na da pasta
 
     folder.appendChild(folderIcon);
     folder.appendChild(folderTitle);
@@ -72,6 +72,8 @@ function criarPasta() {
     document.getElementById("pastaNome").value = "";
 
     document.getElementById("folder__content__container").innerHTML = folderContent.innerHTML;
+
+    fecharModal();
 
     console.log("Pasta criada:", folderName);
 }

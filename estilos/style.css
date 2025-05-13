@@ -113,6 +113,11 @@ span img {
     font-size: 0.9em;
 }
 
+.container__botoes {
+    display: flex;
+    gap: 30px;
+}
+
 .botao {
     background-color: var(--cor-primaria);
     display: block;
@@ -122,6 +127,7 @@ span img {
     padding: 13px;
     border-radius: 10px;
     box-shadow: 1px 1px 6px #00000053;
+    z-index: 999;
 }
 
 .botao:hover {

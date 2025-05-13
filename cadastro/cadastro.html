@@ -4,15 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="style-login/login.css" media="all">
-    <link rel="stylesheet" href="style-login/login-querey.css" media="screen">
-    <title>Login</title>
+    <link rel="stylesheet" href="style-cadastro/cadastro.css" media="all">
+    <link rel="stylesheet" href="style-cadastro/cadastro-querey.css" media="screen">
+    <title>Cadastro</title>
 </head>
 <body>
     <main class="conteiner__principal">
         <section class="login-container">
             <h1>Cadastro</h1>
             <form id="registerForm">
+                <div class="input-container">
+                    <i class="fa-solid fa-user"></i>
+                    <input type="text" id="username" name="username" placeholder="Nome de usuário" required>
+                </div>
+
                 <div class="input-container">
                     <i class="fa-solid fa-user"></i>
                     <input type="email" id="email" name="email" placeholder="E-mail" required>
@@ -37,10 +42,10 @@
 
         </section>
         <div class="imagem">
-            <img src="imagem-login/pessoa-ao-lado.png" alt="pessoa ao lado">
+            <img src="imagem-cadastro/pessoa-ao-lado.png" alt="pessoa ao lado">
         </div>
     </main>
 
-    <script src="script-login/login.js"></script>
+    <script src="script-cadastro/cadastro.js"></script>
 </body>
 </html>

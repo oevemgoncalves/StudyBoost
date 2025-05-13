@@ -18,4 +18,8 @@
         margin-left: 350px; /* mesma largura da sidebar */
         padding: 10px; /* opcional: para afastar o conteúdo da borda */
     }    
+
+    .btn__pdf {
+        width: 200px;
+    }
 }
