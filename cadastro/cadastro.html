@@ -23,14 +23,24 @@
                     <input type="email" id="email" name="email" placeholder="E-mail" required>
                 </div>
 
-                <div class="input-container">
+              <div class="input-container">
                     <i class="fa-solid fa-lock"></i>
                     <input type="password" id="password" name="password" placeholder="Senha" required>
+  
+                     <!-- O botão de olho com o atributo data-target -->
+                    <span class="toggle-password" data-target="password">
+                        <i class="fa-solid fa-eye"></i>
+                    </span>
                 </div>
 
                 <div class="input-container">
                     <i class="fa-solid fa-lock"></i>
                     <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirme a senha" required>
+
+                    <!-- O botão de olho com o atributo data-target -->
+                    <span class="toggle-password" data-target="confirmPassword">
+                        <i class="fa-solid fa-eye"></i>
+                    </span>
                 </div>
 
                 <p id="error-message" class="error-message"></p>
@@ -38,7 +48,7 @@
                 <button type="submit">Cadastrar</button>
             </form>
 
-            <p>Já tem uma conta? <a href="#">Entrar agora</a></p>
+            <p>Já tem uma conta? <a href="../login/login.html" target="_self">Entrar agora</a></p>
 
         </section>
         <div class="imagem">

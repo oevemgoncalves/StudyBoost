@@ -1,0 +1,26 @@
+@media screen and (min-width: 510px) {
+    /*aparecer personagem*/
+    .imagem {
+        display: block;
+        position: absolute;
+        right: -103px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+    .imagem img {
+        width: 170px;
+    }
+
+    .toggle-password {
+        cursor: pointer;
+        margin-left: 8px;
+        color: #888;
+    }
+
+    .input-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+}

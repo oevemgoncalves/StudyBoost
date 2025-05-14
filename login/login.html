@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style-login/login.css" media="all">
+    <link rel="stylesheet" href="style-login/login-query.css" media="screen">
+    <title>Login</title>
+</head>
+<body>
+    <main class="conteiner__principal">
+        <section class="login-container">
+            <h1>Login</h1>
+            <form id="registerForm">
+
+                <div class="input-container">
+                    <i class="fa-solid fa-user"></i>
+                    <input type="email" id="email" name="email" placeholder="E-mail" required>
+                </div>
+
+               <div class="input-container">
+                    <i class="fa-solid fa-lock"></i>
+                    <input type="password" id="password" name="password" placeholder="Senha" required>
+  
+                     <!-- O botão de olho com o atributo data-target -->
+                    <span class="toggle-password" data-target="password">
+                        <i class="fa-solid fa-eye"></i>
+                    </span>
+                </div>
+
+                <button type="submit">Entrar</button>
+            </form>
+
+            <p>Não possui uma conta? <a href="../cadastro/cadastro.html" target="_self">Cadastrar-se</a></p>
+
+        </section>
+        <div class="imagem">
+            <img src="imagem-login/pessoa-ao-lado.png" alt="pessoa ao lado">
+        </div>
+    </main>
+
+    <script src="script-login/login.js"></script>
+</body>
+</html>
