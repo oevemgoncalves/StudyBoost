@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyBoost Note-Taking Application</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/sidebar.css">
+    <link rel="stylesheet" href="styles/notes.css">
+    <link rel="stylesheet" href="styles/modal.css">
+    <link rel="stylesheet" href="styles/chatbot.css">
+</head>
+<body>
+    <!-- Sidebar / Menu Lateral -->
+    <div class="sidebar" id="sidebar">
+        <div class="imagem">
+            <img src="imagem-dash/logo.png" alt="StudyBoost Logo">
+            <span class="nome__logo">StudyBoost</span>
+        </div>
+        <div class="pasta-header">
+            <i class="fa-solid fa-folder"></i>
+            <span class="pasta">Pastas</span>
+        </div>
+
+        <div id="pasta-fixa" class="folder active" data-id="all">
+            <i id="icone-pasta-fixa" class="fa-regular fa-folder-open"></i>
+            <span>Todas as Notas</span>
+        </div>
+        
+        <div id="folder-container"></div>
+        <button class="btn__criar-nova-pasta" id="btnCriarNovaPasta">criar nova pasta</button>
+    </div>
+    
+    <!-- Modal para criar nova pasta -->
+    <div id="modal" class="container__modal hidden">
+        <div class="modal">
+            <i class="fa-solid fa-xmark" id="fecharModal" aria-label="Fechar modal"></i>
+            <h2 class="txt__modal">Criar nova pasta</h2>
+            <p class="txt__modal text">crie nova pasta para organizar suas anotações</p>
+            <div class="input__new__folder">
+                <p>Nome da pasta</p>
+                <input type="text" id="pastaNome" placeholder="Digite o nome da pasta">
+            </div>
+            <br>
+            <button aria-label="Criar nova pasta" class="criar-btn" id="criarPastaBtn">Criar pasta</button>
+        </div>
+    </div>
+
+    <!-- Botão seta (apenas visível no mobile) -->
+    <button class="toggle-arrow" id="toggleArrow" aria-label="Abrir/Fechar menu lateral">
+        <i class="fa-regular fa-square-caret-right"></i>
+    </button>
+
+    <!-- Conteúdo principal -->
+    <main class="container__principal" id="main">
+        <div class="cabecalho">
+            <i class="fa-regular fa-folder-open"></i>
+            <span id="currentFolder">Todas as notas</span>
+            <i class="fa-solid fa-chevron-right"></i>
+            <span>Minhas anotações</span>
+        </div>
+
+        <div class="container__main__conteudo">
+            <div class="nova-nota-section">
+                <h2 class="titulo__main__novapasta">Nova nota</h2>
+                <p class="main__texto">Registre seus pensamentos, ideias e tarefas em uma nota. Você também pode adicionar</p>
+                
+                <div class="media-buttons">
+                    <button class="media-btn">
+                        <i class="fa-solid fa-microphone"></i>
+                        Gravar áudio
+                    </button>
+                    <button class="media-btn">
+                        <i class="fa-solid fa-share-from-square"></i>
+                        Enviar áudio
+                    </button>
+                    <button class="media-btn">
+                        <i class="fa-solid fa-file-pdf"></i>
+                        Upload PDF
+                    </button>
+                    <button class="media-btn">
+                        <i class="fa-brands fa-youtube"></i>
+                        Vídeo do YouTube
+                    </button>
+                </div>
+            </div>
+
+            <div class="minhas-notas-section">
+                <h2 class="section-title">Minhas notas</h2>
+                <div id="notes-container">
+                    <!-- As notas serão inseridas aqui via JavaScript -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Chat Bot -->
+    <div class="chat-bot" id="chatBot">
+        <img src="imagem-dash/360_F_321641973_VeWEI11aEyaChQxRZQhsdSEmJnuj3ZwP.jpg" alt="Chat-bot" width="100%" height="100%">
+    </div>
+
+    <script src="js/app.js" type="module"></script>
+</body>
+</html>
