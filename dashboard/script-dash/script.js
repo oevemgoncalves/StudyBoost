@@ -77,3 +77,7 @@ function criarPasta() {
 
     console.log("Pasta criada:", folderName);
 }
+
+function abrirChat() {
+    alert ("Chat aberto! (Aqui você pode mostrar o chat real");
+}

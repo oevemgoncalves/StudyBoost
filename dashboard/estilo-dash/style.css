@@ -333,5 +333,26 @@ div.cabecalho > span {
     position: fixed;
     bottom: 20px;
     right: 20px;
+    width: 100px;
+    height: 100px;
     z-index: 999;
+    cursor: pointer;
+    animation: pular 1s infinite;
+}
+
+.chat-bot img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/*animação de pulo*/
+@keyframes pular {
+    0%, 100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
 }
