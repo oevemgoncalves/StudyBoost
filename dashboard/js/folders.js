@@ -1,9 +1,9 @@
-// Folder management
+// gerenciamento de pastas
 import { store } from './store.js';
 import { renderCurrentView } from './app.js';
 import { renderNotes } from './notes.js';
 
-// DOM elements
+// elementos do DOM (variaves)
 let modal;
 let pastaInput;
 let criarPastaBtn;
@@ -12,7 +12,7 @@ let btnCriarNovaPasta;
 let pastaFixa;
 
 function initFolders() {
-    // Get DOM elements
+    // Obtendo os elementos do DOM
     modal = document.getElementById('modal');
     pastaInput = document.getElementById('pastaNome');
     criarPastaBtn = document.getElementById('criarPastaBtn');
@@ -20,20 +20,20 @@ function initFolders() {
     btnCriarNovaPasta = document.getElementById('btnCriarNovaPasta');
     pastaFixa = document.getElementById('pasta-fixa');
     
-    // Set up event listeners
+    // Configurando ouvintes de eventos
     btnCriarNovaPasta.addEventListener('click', openModal);
     document.getElementById('fecharModal').addEventListener('click', closeModal);
     criarPastaBtn.addEventListener('click', createFolder);
     pastaFixa.addEventListener('click', () => selectFolder('all'));
     
-    // Handle pressing Enter in the input
+    // quando precionar Enter ele vai entrar
     pastaInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
             createFolder();
         }
     });
     
-    // Close modal when clicking outside
+    // Fechar modal ao clicar fora
     window.addEventListener('click', (e) => {
         if (e.target === modal) {
             closeModal();
@@ -43,7 +43,7 @@ function initFolders() {
     // Subscribe to folder changes
     store.subscribe('folderChange', renderFolders);
     
-    // Initial render
+    // Renderização inicial
     renderFolders();
 }
 
@@ -51,7 +51,7 @@ function openModal() {
     modal.classList.remove('hidden');
     document.body.classList.add('modal-open');
     
-    // Small delay to ensure the modal is in the DOM before animating
+    // Pequeno atraso para garantir que o modal esteja no DOM antes da animação
     setTimeout(() => {
         modal.classList.add('active');
         pastaInput.focus();
@@ -62,7 +62,7 @@ function closeModal() {
     modal.classList.remove('active');
     document.body.classList.remove('modal-open');
     
-    // Delay hiding the modal until animation completes
+    // Atrasar a ocultação do modal até que a animação seja concluída
     setTimeout(() => {
         modal.classList.add('hidden');
         pastaInput.value = '';
@@ -77,15 +77,15 @@ function createFolder() {
         return;
     }
     
-    // Add the folder to the store
+    // Adiciona a pasta ao armazenamento (navegador)
     const newFolder = store.addFolder({
         name: folderName
     });
     
-    // Select the new folder
+    // selecionar a nova pasta
     selectFolder(newFolder.id);
     
-    // Close the modal
+    // fecha o modal
     closeModal();
 }
 
@@ -96,13 +96,13 @@ function selectFolder(folderId) {
 }
 
 function renderFolders() {
-    // Get all folders except the fixed one
+    // Seleciona todas as pastas, exceto a fixa
     const folders = store.getFolders().filter(folder => !folder.isFixed);
     
-    // Clear folder container
+    // Limpar contêiner de pasta
     folderContainer.innerHTML = '';
     
-    // Add each folder to the container
+    // Adicione cada pasta ao contêiner
     folders.forEach(folder => {
         const folderEl = document.createElement('div');
         folderEl.className = 'folder';
@@ -122,7 +122,7 @@ function renderFolders() {
         folderContainer.appendChild(folderEl);
     });
     
-    // Update active folder UI
+    // Atualizar UI da pasta ativa
     const activeFolder = store.getActiveFolder();
     document.querySelectorAll('.folder').forEach(folderEl => {
         const folderId = folderEl.getAttribute('data-id');

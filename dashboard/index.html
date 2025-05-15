@@ -3,13 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StudyBoost Note-Taking Application</title>
+    <title>StudyBoost</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/main-1.css">
+    <link rel="stylesheet" href="styles/sidebar-1.css">
+    <link rel="stylesheet" href="styles/notes-1.css">
+    <link rel="stylesheet" href="styles/modal-1.css">
+    <link rel="stylesheet" href="styles/chatbot-1.css">
+    <!-- <link rel="stylesheet" href="styles/main.css">
     <link rel="stylesheet" href="styles/sidebar.css">
     <link rel="stylesheet" href="styles/notes.css">
     <link rel="stylesheet" href="styles/modal.css">
-    <link rel="stylesheet" href="styles/chatbot.css">
+    <link rel="stylesheet" href="styles/chatbot.css"> -->
 </head>
 <body>
     <!-- Sidebar / Menu Lateral -->
@@ -29,7 +34,7 @@
         </div>
         
         <div id="folder-container"></div>
-        <button class="btn__criar-nova-pasta" id="btnCriarNovaPasta">criar nova pasta</button>
+        <button class="btn__criar-nova-pasta" id="btnCriarNovaPasta">+ criar nova pasta</button>
     </div>
     
     <!-- Modal para criar nova pasta -->
@@ -48,7 +53,7 @@
     </div>
 
     <!-- Botão seta (apenas visível no mobile) -->
-    <button class="toggle-arrow" id="toggleArrow" aria-label="Abrir/Fechar menu lateral">
+    <button class="toggle-arrow" id="toggleArrow" aria-label="Abrir/Fechar menu lateral" onclick="toggleSidebar()">
         <i class="fa-regular fa-square-caret-right"></i>
     </button>
 
@@ -67,22 +72,22 @@
                 <p class="main__texto">Registre seus pensamentos, ideias e tarefas em uma nota. Você também pode adicionar</p>
                 
                 <div class="media-buttons">
-                    <button class="media-btn">
+                    <!-- <button class="media-btn">
                         <i class="fa-solid fa-microphone"></i>
                         Gravar áudio
                     </button>
                     <button class="media-btn">
                         <i class="fa-solid fa-share-from-square"></i>
                         Enviar áudio
-                    </button>
+                    </button> -->
                     <button class="media-btn">
                         <i class="fa-solid fa-file-pdf"></i>
                         Upload PDF
                     </button>
-                    <button class="media-btn">
+                    <!-- <button class="media-btn">
                         <i class="fa-brands fa-youtube"></i>
                         Vídeo do YouTube
-                    </button>
+                    </button> -->
                 </div>
             </div>
 

@@ -1,14 +1,14 @@
-// Chat bot functionality
+// Funcionalidade do bot de bate-papo
 function initChatBot() {
     const chatBot = document.getElementById('chatBot');
     let chatContainer = null;
     
-    // Set up event listener
+    // Configurar ouvinte de eventos
     chatBot.addEventListener('click', toggleChatBot);
     
-    // Create chat interface dynamically when needed
+    // Crie uma interface de bate-papo dinamicamente quando necessário
     function createChatInterface() {
-        // Create chat container if it doesn't exist
+        // Crie um contêiner de bate-papo se ele não existir
         if (!chatContainer) {
             chatContainer = document.createElement('div');
             chatContainer.className = 'chat-container';
@@ -34,7 +34,7 @@ function initChatBot() {
             
             document.body.appendChild(chatContainer);
             
-            // Set up event listeners for chat interface
+            // Configurar ouvintes de eventos para interface de bate-papo
             const chatClose = document.getElementById('chatClose');
             const chatInput = document.getElementById('chatInput');
             const sendMessage = document.getElementById('sendMessage');
@@ -56,10 +56,10 @@ function initChatBot() {
     }
     
     function toggleChatBot() {
-        // Create chat interface if it doesn't exist
+        // Crie uma interface de bate-papo se ela não existir
         createChatInterface();
         
-        // Toggle chat visibility
+        // Alternar visibilidade do bate-papo
         if (chatContainer.classList.contains('active')) {
             closeChatBot();
         } else {
@@ -81,23 +81,23 @@ function initChatBot() {
         
         const chatMessages = document.getElementById('chatMessages');
         
-        // Add user message
+        // Adicionar mensagem do usuário
         const userMessageEl = document.createElement('div');
         userMessageEl.className = 'message user';
         userMessageEl.textContent = message;
         chatMessages.appendChild(userMessageEl);
         
-        // Scroll to bottom
+        // Role para baixo
         chatMessages.scrollTop = chatMessages.scrollHeight;
         
-        // Add bot response after a delay (simulating thinking)
+        // Adicionar resposta do bot após um atraso (simulando o pensamento)
         setTimeout(() => {
             const botMessageEl = document.createElement('div');
             botMessageEl.className = 'message bot';
             botMessageEl.textContent = getBotResponse(message);
             chatMessages.appendChild(botMessageEl);
             
-            // Scroll to bottom again
+            // Role para baixo novamente
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }, 1000);
     }

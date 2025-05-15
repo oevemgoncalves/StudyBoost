@@ -120,7 +120,8 @@ span img {
 
 .botao {
     background-color: var(--cor-primaria);
-    display: block;
+    display: flex;
+    justify-content: center;
     text-align: center;
     width: 140px;
     margin-top: 20px;
@@ -156,17 +157,16 @@ div.conteiner__lendo {
     justify-content: center;
 }
 
+.conteiner__imglivros {
+    margin-top: 20px;
+    width: 190px;
+}
 .conteiner__imglendo {
     width: 200px;
     margin-right: 30px;
     position: relative;
     left: 20px;
     top: -90px;
-}
-
-.conteiner__imglivros {
-    margin-top: 20px;
-    width: 190px;
 }
 
 .conteiner__texto {

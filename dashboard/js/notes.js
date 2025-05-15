@@ -1,18 +1,18 @@
-// Note management
+// Gerenciamento de notas
 import { store } from './store.js';
 
-// DOM elements
+// elemento DOM
 let notesContainer;
 
 function initNotes() {
-    // Get DOM elements
+    // busca elemento DOM
     notesContainer = document.getElementById('notes-container');
     
-    // Subscribe to note changes
+    // Inscreva-se para receber alterações de notas
     store.subscribe('noteChange', renderNotes);
     store.subscribe('activeFolderChange', renderNotes);
     
-    // Initial render
+    // Renderização inicial
     renderNotes();
 }
 
@@ -20,7 +20,7 @@ function renderNotes() {
     const activeFolder = store.getActiveFolder();
     const notes = store.getNotesByFolder(activeFolder.id);
     
-    // Clear notes container
+    // limpa o conteiner de notas
     notesContainer.innerHTML = '';
     
     if (notes.length === 0) {
@@ -28,7 +28,7 @@ function renderNotes() {
         return;
     }
     
-    // Add each note to the container
+    // Adicione cada nota ao contêiner
     notes.forEach(note => {
         const noteEl = createNoteElement(note);
         notesContainer.appendChild(noteEl);
@@ -61,7 +61,7 @@ function createNoteElement(note) {
     addToFolder.innerHTML = '<i class="fa-regular fa-folder"></i> Adicionar pasta';
     addToFolder.addEventListener('click', (e) => {
         e.stopPropagation();
-        // Add to folder functionality would go here
+        // A funcionalidade Adicionar à pasta ficar aqui
     });
     
     const copyText = document.createElement('button');
@@ -87,7 +87,7 @@ function createNoteElement(note) {
     noteEl.appendChild(content);
     noteEl.appendChild(footer);
     
-    // Add click event to open the note
+    // Adicionar evento de clique para abrir a nota
     noteEl.addEventListener('click', () => openNote(note.id));
     
     return noteEl;
@@ -114,7 +114,7 @@ function openNote(noteId) {
     const note = store.getNotes().find(n => n.id === noteId);
     if (note) {
         console.log('Opening note:', note);
-        // In a real app, this would open a note editor or viewer
+        // Em um aplicativo real, isso abriria um editor ou visualizador de notas
         alert(`Nota aberta: ${note.title}`);
     }
 }

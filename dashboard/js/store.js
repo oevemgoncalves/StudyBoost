@@ -1,6 +1,6 @@
-// Simple data store for the application
+// Armazenamento de dados simples para o aplicativo
 const store = (() => {
-    // Application state
+    // Estado do aplicativo
     let state = {
         notes: [],
         folders: [
@@ -9,14 +9,14 @@ const store = (() => {
         activeFolder: { id: 'all', name: 'Todas as Notas', isFixed: true }
     };
     
-    // Event subscribers
+    // Assinantes do evento
     const subscribers = {
         noteChange: [],
         folderChange: [],
         activeFolderChange: []
     };
     
-    // Subscribe to state changes
+    // Assine as mudanças de estado
     function subscribe(event, callback) {
         if (subscribers[event]) {
             subscribers[event].push(callback);
@@ -27,19 +27,19 @@ const store = (() => {
         return () => {};
     }
     
-    // Notify subscribers of state changes
+    // Notificar assinantes sobre mudanças de estado
     function notify(event) {
         if (subscribers[event]) {
             subscribers[event].forEach(callback => callback(state));
         }
     }
     
-    // Get all notes
+    // Obtenha todas as notas
     function getNotes() {
         return [...state.notes];
     }
     
-    // Get notes for a specific folder
+    // Obter notas para uma pasta específica
     function getNotesByFolder(folderId) {
         if (folderId === 'all') {
             return [...state.notes];
@@ -47,7 +47,7 @@ const store = (() => {
         return state.notes.filter(note => note.folderId === folderId);
     }
     
-    // Add a new note
+    // add uma nova nota
     function addNote(note) {
         const newNote = {
             ...note,
@@ -59,7 +59,7 @@ const store = (() => {
         return newNote;
     }
     
-    // Update an existing note
+    // atualiza uma nota existente
     function updateNote(noteId, updates) {
         state.notes = state.notes.map(note => 
             note.id === noteId ? { ...note, ...updates } : note
@@ -67,18 +67,18 @@ const store = (() => {
         notify('noteChange');
     }
     
-    // Delete a note
+    // excluir uma nota
     function deleteNote(noteId) {
         state.notes = state.notes.filter(note => note.id !== noteId);
         notify('noteChange');
     }
     
-    // Get all folders
+    // obtendo todas as pastas
     function getFolders() {
         return [...state.folders];
     }
     
-    // Add a new folder
+    // Add uma nova pasta
     function addFolder(folder) {
         const newFolder = {
             ...folder,
@@ -89,15 +89,15 @@ const store = (() => {
         return newFolder;
     }
     
-    // Delete a folder and its notes
+    // excluindo uma nova pasta e suas notas
     function deleteFolder(folderId) {
-        // Can't delete the fixed folder
+        // Não é possível excluir a pasta corrigida
         if (folderId === 'all') return false;
         
-        // Delete the folder
+        // exclua a pasta
         state.folders = state.folders.filter(folder => folder.id !== folderId);
         
-        // Set active folder to 'all' if the deleted folder was active
+        // Defina a pasta ativa como 'todos' se a pasta excluída estiver ativa
         if (state.activeFolder.id === folderId) {
             setActiveFolder('all');
         }
@@ -106,7 +106,7 @@ const store = (() => {
         return true;
     }
     
-    // Set the active folder
+    // Defina a pasta ativa
     function setActiveFolder(folderId) {
         const folder = state.folders.find(f => f.id === folderId);
         if (folder) {
@@ -115,12 +115,12 @@ const store = (() => {
         }
     }
     
-    // Get the active folder
+    // obtendo a pasta ativa
     function getActiveFolder() {
         return { ...state.activeFolder };
     }
     
-    // Load data from localStorage
+    // Carregar dados da pasta localStoragetive
     function loadFromStorage() {
         try {
             const savedNotes = localStorage.getItem('studyboost_notes');
@@ -136,7 +136,7 @@ const store = (() => {
             
             if (savedFolders) {
                 const folders = JSON.parse(savedFolders);
-                // Make sure we always have the fixed 'all' folder
+                // Certifique-se de que sempre temos a pasta 'all' fixa
                 if (!folders.some(f => f.id === 'all')) {
                     folders.unshift({ id: 'all', name: 'Todas as Notas', isFixed: true });
                 }
@@ -156,7 +156,7 @@ const store = (() => {
         }
     }
     
-    // Save data to localStorage
+    // Salvar dados no localStorage
     function saveToStorage() {
         try {
             localStorage.setItem('studyboost_notes', JSON.stringify(state.notes));
@@ -167,20 +167,20 @@ const store = (() => {
         }
     }
     
-    // Initialize the store
+    // Inicialize o armazenamento
     function init() {
         loadFromStorage();
         
-        // Set up auto-save when state changes
+        // Configurar salvamento automático quando o estado mudar
         subscribe('noteChange', saveToStorage);
         subscribe('folderChange', saveToStorage);
         subscribe('activeFolderChange', saveToStorage);
     }
     
-    // Initialize store when module is loaded
+    // Inicializar o armazenamento quando o módulo for carregado
     init();
     
-    // Public API
+    // API pública
     return {
         getNotes,
         getNotesByFolder,

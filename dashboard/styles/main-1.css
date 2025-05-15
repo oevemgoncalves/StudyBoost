@@ -55,21 +55,19 @@ body.modal-open {
     transition: margin-left 0.3s ease;
 }
 
-@media (min-width: 768px) {
+@media screen and (min-width: 769px){
     .container__principal {
         margin-left: 330px;
         margin-right: 32px;
     }
-
-    .sidebar.closed + .toggle-arrow + .container__principal {
-        margin-left: 32px;
-    }
 }
 
+/*cabeçalho*/
 .cabecalho {
     display: flex;
     align-items: center;
     margin-bottom: 24px;
+    margin-left: 38px;
     color: var(--cor-text-secondary);
     font-size: 0.875rem;
 }
@@ -82,6 +80,7 @@ body.modal-open {
     margin: 0 4px;
 }
 
+/*container principal*/
 .container__main__conteudo {
     display: flex;
     flex-direction: column;
@@ -102,13 +101,7 @@ body.modal-open {
     line-height: 1.5;
 }
 
-.section-title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin-bottom: 16px;
-    color: var(--cor-text-primary);
-}
-
+/*box nova nota*/
 .nova-nota-section {
     background-color: var(--cor-terciaria);
     padding: 24px;
@@ -117,23 +110,26 @@ body.modal-open {
     margin-bottom: 24px;
 }
 
+/*minhas notas*/
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: var(--cor-text-primary);
+}
+
 .minhas-notas-section {
     margin-bottom: 32px;
 }
 
-.media-buttons {
+/* .media-buttons {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 12px;
     margin-top: 16px;
-}
+} */
 
-@media (min-width: 640px) {
-    .media-buttons {
-        grid-template-columns: repeat(4, 1fr);
-    }
-}
-
+/*botao pdf*/
 .media-btn {
     display: flex;
     align-items: center;
@@ -162,23 +158,4 @@ body.modal-open {
 
 .media-btn:first-child:hover {
     background-color: var(--cor-primaria-hover);
-}
-
-/* Responsividade */
-@media (max-width: 768px) {
-    .cabecalho {
-        font-size: 0.75rem;
-    }
-    
-    .titulo__main__novapasta {
-        font-size: 1.25rem;
-    }
-    
-    .section-title {
-        font-size: 1.125rem;
-    }
-    
-    .nova-nota-section {
-        padding: 16px;
-    }
 }

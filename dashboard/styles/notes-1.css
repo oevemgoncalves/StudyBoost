@@ -1,20 +1,8 @@
-/* Notes container */
+/* container notas */
 #notes-container {
     display: grid;
     grid-template-columns: 1fr;
     gap: 16px;
-}
-
-@media (min-width: 640px) {
-    #notes-container {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (min-width: 1024px) {
-    #notes-container {
-        grid-template-columns: repeat(3, 1fr);
-    }
 }
 
 /* Note card */
@@ -103,7 +91,7 @@
     color: var(--cor-text-secondary);
 }
 
-/* Empty state */
+/* estado vazio */
 .empty-notes {
     grid-column: 1 / -1;
     text-align: center;

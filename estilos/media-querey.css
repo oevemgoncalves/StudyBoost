@@ -50,8 +50,8 @@
     }
 
     .conteiner__img img {
-        height: 300px;
-        width: 350px;
+        height: 290px;
+        width: 290px;
     }
 
     
@@ -134,7 +134,6 @@
         color: var(--cor-terciaria);
         font-size: 1em;
     }
-
 
     .conteiner__img{
         position: relative;
