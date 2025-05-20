@@ -1,18 +1,60 @@
-document.getElementById("registerForm").addEventListener("submit", function(event) {
-    let password = document.getElementById("password").value;
-    let confirmPassword = document.getElementById("confirmPassword");
-    let confirmContainer = confirmPassword.parentElement; // Pega a div .input-container
-    let errorMessage = document.getElementById("error-message");
+// cadastro.js
+import { auth } from "../../firebase-config.js"; // Agora o auth existe!
+import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js"; // Atualize para v11.8.0
 
-    if (password !== confirmPassword.value) {
-        errorMessage.textContent = "As senhas não coincidem!";
-        errorMessage.style.display = "block";
-        confirmContainer.classList.add("input-error"); // Deixa a borda vermelha na div
-        event.preventDefault(); // Impede o envio do formulário
-    } else {
-        errorMessage.style.display = "none";
-        confirmContainer.classList.remove("input-error"); // Remove o erro ao corrigir
+document.getElementById("registerForm").addEventListener("submit", async function (event) {
+  event.preventDefault(); // Previne envio automático
+
+  let password = document.getElementById("password").value;
+  let confirmPassword = document.getElementById("confirmPassword");
+  let confirmContainer = confirmPassword.parentElement;
+  let errorMessage = document.getElementById("error-message");
+
+  if (password !== confirmPassword.value) {
+    errorMessage.textContent = "As senhas não coincidem!";
+    errorMessage.style.display = "block";
+    confirmContainer.classList.add("input-error");
+    return;
+  } else {
+    errorMessage.style.display = "none";
+    confirmContainer.classList.remove("input-error");
+  }
+
+  const email = document.getElementById("email").value;
+  try {
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+
+    // Validação do e-mail
+    if (!email || !email.includes("@") || !email.includes(".")) {
+      errorMessage.textContent = "E-mail inválido! Use o formato: usuario@exemplo.com";
+      errorMessage.style.display = "block";
+      return;
     }
+
+    // Prossegue se o e-mail for válido
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    console.log("Usuário criado:", userCredential.user);
+    alert("Cadastro realizado com sucesso!");
+    window.location.href = "../login/login.html";
+  } catch (error) {
+    console.error("Erro ao cadastrar:", error);
+    errorMessage.textContent = "Erro: " + error.message;
+    errorMessage.style.display = "block";
+  }
+  // try {
+  //   const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+  //   const user = userCredential.user;
+  //   console.log("Usuário criado:", user);
+  //   alert("Cadastro realizado com sucesso!");
+  //   window.location.href = "../login/login.html";
+  // } catch (error) {
+  //   console.error("Erro ao cadastrar:", error);
+  //   errorMessage.textContent = "Erro: " + error.message;
+  //   errorMessage.style.display = "block";
+  // }
+
+  console.log("Formulário enviado!");
 });
 
 document.addEventListener("DOMContentLoaded", function () {
