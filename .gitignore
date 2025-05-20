@@ -1,0 +1,19 @@
+# Firebase e Node.js
+node_modules/
+.firebase/
+.cache/
+firebase-debug.log
+
+# Arquivos de ambiente
+.env
+.env.local
+
+# Sistemas operacionais/IDEs
+.DS_Store
+.idea/
+.vscode/
+
+# Dependências/Build
+package-lock.json  # Opcional - só ignore se não for usar versões exatas
+dist/
+out/
