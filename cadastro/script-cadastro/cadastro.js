@@ -2,6 +2,7 @@
 import { auth } from "../../firebase-config.js"; // Agora o auth existe!
 import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js"; // Atualize para v11.8.0
 
+//autenticação de usuário
 document.getElementById("registerForm").addEventListener("submit", async function (event) {
   event.preventDefault(); // Previne envio automático
 
@@ -42,21 +43,11 @@ document.getElementById("registerForm").addEventListener("submit", async functio
     errorMessage.textContent = "Erro: " + error.message;
     errorMessage.style.display = "block";
   }
-  // try {
-  //   const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-  //   const user = userCredential.user;
-  //   console.log("Usuário criado:", user);
-  //   alert("Cadastro realizado com sucesso!");
-  //   window.location.href = "../login/login.html";
-  // } catch (error) {
-  //   console.error("Erro ao cadastrar:", error);
-  //   errorMessage.textContent = "Erro: " + error.message;
-  //   errorMessage.style.display = "block";
-  // }
 
   console.log("Formulário enviado!");
 });
 
+// Função para alternar a visibilidade da senha
 document.addEventListener("DOMContentLoaded", function () {
   const toggleButtons = document.querySelectorAll(".toggle-password");
 
