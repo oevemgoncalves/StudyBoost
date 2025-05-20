@@ -18,7 +18,7 @@
 }
 
 .toggle-arrow {
-    position: fixed;
+    position: absolute;
     top: 20px;
     left: 10px;
     font-size: 24px;
@@ -35,6 +35,7 @@
 /* Quando a sidebar estiver aberta, seta vai pra dentro */
 .sidebar.open ~ .toggle-arrow {
     left: 260px; /* um pouco dentro da sidebar (320 - botão) */
+    position: fixed;
 }
 
 /* Logo and branding */
@@ -78,7 +79,7 @@ span.pasta {
     font-weight: 600;
 }
 
-/* Folder styles */
+/* estilo das pastas */
 .folder {
     display: flex;
     align-items: center;

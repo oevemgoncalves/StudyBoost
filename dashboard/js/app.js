@@ -4,6 +4,7 @@ import { initNotes } from './notes.js';
 import { initFolders } from './folders.js';
 import { initChatBot } from './chatbot.js';
 import { store } from './store.js';
+import { initModalPdf } from './modal-pdf.js';
 
 // Initialize the application
 function initApp() {
@@ -12,7 +13,8 @@ function initApp() {
     initFolders();
     initNotes();
     initChatBot();
-    
+    initModalPdf();
+
     // Add some demo notes if there are none
     if (store.getNotes().length === 0) {
         addDemoNotes();
@@ -51,18 +53,18 @@ function renderCurrentView() {
 
 // Add demo notes for initial state
 function addDemoNotes() {
-    store.addNote({
-        id: 'note-1',
-        title: 'Welcome to Feynman AI: Your Study and Work Companion',
-        content: 'A powerful tool for transforming recordings and PDFs into organized notes using the Feynman technique.',
-        folderId: 'all',
-        createdAt: new Date('2024-11-09T15:08:00')
-    });
+    // store.addNote({
+    //     id: 'note-1',
+    //     title: 'Welcome to Feynman AI: Your Study and Work Companion',
+    //     content: 'A powerful tool for transforming recordings and PDFs into organized notes using the Feynman technique.',
+    //     folderId: 'all',
+    //     createdAt: new Date('2024-11-09T15:08:00')
+    // });
     
     store.addNote({
         id: 'note-2',
-        title: 'Como fazer anotações eficientes',
-        content: 'Utilize o método Cornell para organizar suas anotações. Divida a página em seções para perguntas, notas e resumo.',
+        title: 'Bem-vindo ao StudyBoost, a plataforma inteligente para seu aprendizado.',
+        content: 'Uma ferramenta poderosa para transformar PDFs em notas organizadas usando a técnica de estudos.',
         folderId: 'all',
         createdAt: new Date('2024-11-07T10:15:00')
     });

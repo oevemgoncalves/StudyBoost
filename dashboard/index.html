@@ -9,12 +9,9 @@
     <link rel="stylesheet" href="styles/sidebar-1.css">
     <link rel="stylesheet" href="styles/notes-1.css">
     <link rel="stylesheet" href="styles/modal-1.css">
+    <link rel="stylesheet" href="styles/modal-pdf.css">
     <link rel="stylesheet" href="styles/chatbot-1.css">
-    <!-- <link rel="stylesheet" href="styles/main.css">
-    <link rel="stylesheet" href="styles/sidebar.css">
-    <link rel="stylesheet" href="styles/notes.css">
-    <link rel="stylesheet" href="styles/modal.css">
-    <link rel="stylesheet" href="styles/chatbot.css"> -->
+
 </head>
 <body>
     <!-- Sidebar / Menu Lateral -->
@@ -52,6 +49,23 @@
         </div>
     </div>
 
+    <!-- Modal de Upload de PDF -->
+    <div id="container__principal__modal__pdf" class="container__principal__modal__pdf hidden">
+        <div class="container__modal-pdf">
+            <i class="fa-solid fa-xmark close-btn" id="closeUploadModalBtn"></i>
+            <i class="fa-solid fa-arrow-up-from-bracket"></i>
+            <h2>Baixar PDF</h2>
+
+            <label class="upload-area" for="fileInput">
+                <span id="uploadText">Clique para baixar seu arquivo PDF</span>
+            </label>
+
+            <input type="file" id="fileInput" accept=".pdf" onchange="handleFileUpload(event)" />
+
+            <button class="btn__gerar__nota" id="btnGerarNota" onclick="gerarNota()">Gerar Nota</button>
+        </div>
+    </div>
+
     <!-- Botão seta (apenas visível no mobile) -->
     <button class="toggle-arrow" id="toggleArrow" aria-label="Abrir/Fechar menu lateral" onclick="toggleSidebar()">
         <i class="fa-regular fa-square-caret-right"></i>
@@ -61,7 +75,7 @@
     <main class="container__principal" id="main">
         <div class="cabecalho">
             <i class="fa-regular fa-folder-open"></i>
-            <span id="currentFolder">Todas as notas</span>
+            <button id="currentFolder">Todas as notas</button>
             <i class="fa-solid fa-chevron-right"></i>
             <span>Minhas anotações</span>
         </div>
@@ -80,7 +94,7 @@
                         <i class="fa-solid fa-share-from-square"></i>
                         Enviar áudio
                     </button> -->
-                    <button class="media-btn">
+                    <button class="media-btn" id="abrirUploadModalBtn">
                         <i class="fa-solid fa-file-pdf"></i>
                         Upload PDF
                     </button>

@@ -76,8 +76,20 @@ body.modal-open {
     margin-right: 4px;
 }
 
-.cabecalho span {
+.cabecalho button {
     margin: 0 4px;
+}
+
+.cabecalho #currentFolder {
+    background: none;
+    border: none;
+    color: var(--cor-text-primary);
+    font-size: 0.875rem;
+    cursor: pointer;
+}
+
+.cabecalho #currentFolder:hover {
+    color: var(--cor-acao-botao);
 }
 
 /*container principal*/
