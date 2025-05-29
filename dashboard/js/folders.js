@@ -1,6 +1,7 @@
 // gerenciamento de pastas
 import { store } from './store.js';
 import { renderCurrentView } from './app.js';
+import { showMainView } from './app.js';
 import { renderNotes } from './notes.js';
 
 // elementos do DOM (variaves)
@@ -91,6 +92,7 @@ function createFolder() {
 
 function selectFolder(folderId) {
     store.setActiveFolder(folderId);
+    showMainView(); // Mostra a view principal
     renderCurrentView();
     renderNotes();
 }

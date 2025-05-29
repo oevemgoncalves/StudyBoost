@@ -110,13 +110,20 @@ function renderEmptyState() {
     notesContainer.appendChild(emptyEl);
 }
 
+// function openNote(noteId) {
+//     const note = store.getNotes().find(n => n.id === noteId);
+//     if (note) {
+//         console.log('Opening note:', note);
+//         // Em um aplicativo real, isso abriria um editor ou visualizador de notas
+//         alert(`Nota aberta: ${note.title}`);
+//     }
+// }
+
+// Modifique a função openNote
 function openNote(noteId) {
-    const note = store.getNotes().find(n => n.id === noteId);
-    if (note) {
-        console.log('Opening note:', note);
-        // Em um aplicativo real, isso abriria um editor ou visualizador de notas
-        alert(`Nota aberta: ${note.title}`);
-    }
+    showNoteView(noteId);
+    // Atualiza o botão ativo para "Notas"
+    document.querySelector('.btn[data-target="notas"]').classList.add('active');
 }
 
 function createNewNote() {
@@ -158,4 +165,31 @@ function formatDate(date) {
     }
 }
 
-export { initNotes, renderNotes };
+// Adicione esta função para mostrar a view de nota
+function showNoteView(noteId) {
+    const note = store.getNotes().find(n => n.id === noteId);
+    if (note) {
+        // Atualiza o conteúdo da nota
+        document.querySelector('#notas .container__nota__resumo').innerHTML = `
+            <h1>${note.title}</h1>
+            <p>${note.content}</p>
+        `;
+        
+        // Mostra a view de nota e esconde o upload
+        document.getElementById('noteContentContainer').classList.remove('hidden');
+        document.querySelector('.nova-nota-section').classList.add('hidden');
+    }
+}
+
+// Adicione esta função para voltar à visualização principal
+function showMainView() {
+    document.getElementById('noteContentContainer').classList.add('hidden');
+    document.querySelector('.nova-nota-section').classList.remove('hidden');
+}
+
+// Modifique o event listener no app.js
+document.getElementById('currentFolder').addEventListener('click', () => {
+    showMainView();
+});
+
+export { initNotes, renderNotes, showNoteView };

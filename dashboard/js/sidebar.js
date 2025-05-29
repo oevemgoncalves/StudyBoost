@@ -28,6 +28,14 @@ function initSidebar() {
             updateToggleArrowIcon();
         }
     });
+
+    //novo evento
+    document.querySelectorAll('.folder').forEach(folder => {
+        folder.addEventListener('click', () => {
+            showMainView(); // Adicione esta linha
+        });
+    });
 }
 
+// Exporte a função
 export { initSidebar };

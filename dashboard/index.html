@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,8 +12,10 @@
     <link rel="stylesheet" href="styles/modal-1.css">
     <link rel="stylesheet" href="styles/modal-pdf.css">
     <link rel="stylesheet" href="styles/chatbot-1.css">
+    <link rel="stylesheet" href="styles/cards.css">
 
 </head>
+
 <body>
     <!-- Sidebar / Menu Lateral -->
     <div class="sidebar" id="sidebar">
@@ -29,11 +32,11 @@
             <i id="icone-pasta-fixa" class="fa-regular fa-folder-open"></i>
             <span>Todas as Notas</span>
         </div>
-        
+
         <div id="folder-container"></div>
         <button class="btn__criar-nova-pasta" id="btnCriarNovaPasta">+ criar nova pasta</button>
     </div>
-    
+
     <!-- Modal para criar nova pasta -->
     <div id="modal" class="container__modal hidden">
         <div class="modal">
@@ -83,8 +86,9 @@
         <div class="container__main__conteudo">
             <div class="nova-nota-section">
                 <h2 class="titulo__main__novapasta">Nova nota</h2>
-                <p class="main__texto">Registre seus pensamentos, ideias e tarefas em uma nota. Você também pode adicionar</p>
-                
+                <p class="main__texto">Registre seus pensamentos, ideias e tarefas em uma nota. Você também pode
+                    adicionar</p>
+
                 <div class="media-buttons">
                     <!-- <button class="media-btn">
                         <i class="fa-solid fa-microphone"></i>
@@ -112,13 +116,38 @@
                 </div>
             </div>
         </div>
+
+        <div id="noteContentContainer" class="btn__card hidden">
+            <div class="botoes">
+                <button class="btn notaActive" data-target="notas">Notas</button>
+                <button class="btn" data-target="quiz">Quiz</button>
+                <button class="btn" data-target="flashcards">Flashcards</button>
+                <button class="btn" data-target="audio">Áudio</button>
+
+            </div>
+            <section id="notas" class="container__nota">
+                <div class="container__nota__resumo">
+                    <h1>Bem-vindo ao StudyBoost, a plataforma inteligente para seu aprendizado.</h1>
+                    <p>Uma ferramenta poderosa para transformar gravações e PDFs em notas organizadas usando a técnicade estudos</p>
+                </div>
+            </section>
+
+            <section id="quiz" class="container__nota hidden">Conteúdo do Quiz aqui...</section>
+            <section id="flashcards" class="container__nota hidden">Conteúdo de Flashcards aqui...</section>
+            <section id="audio" class="container__nota hidden">Conteúdo de Áudio aqui...</section>
+
+        </div>
+
+        </div>
     </main>
 
     <!-- Chat Bot -->
     <div class="chat-bot" id="chatBot">
-        <img src="imagem-dash/360_F_321641973_VeWEI11aEyaChQxRZQhsdSEmJnuj3ZwP.jpg" alt="Chat-bot" width="100%" height="100%">
+        <img src="imagem-dash/360_F_321641973_VeWEI11aEyaChQxRZQhsdSEmJnuj3ZwP.jpg" alt="Chat-bot" width="100%"
+            height="100%">
     </div>
 
     <script src="js/app.js" type="module"></script>
 </body>
+
 </html>

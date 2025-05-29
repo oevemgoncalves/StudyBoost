@@ -1,10 +1,11 @@
 // Main application file
 import { initSidebar } from './sidebar.js';
-import { initNotes } from './notes.js';
+import { initNotes, showNoteView } from './notes.js';
 import { initFolders } from './folders.js';
 import { initChatBot } from './chatbot.js';
 import { store } from './store.js';
 import { initModalPdf } from './modal-pdf.js';
+import { initCards } from './cards.js';
 
 // Initialize the application
 function initApp() {
@@ -14,7 +15,8 @@ function initApp() {
     initNotes();
     initChatBot();
     initModalPdf();
-
+    initCards();
+    
     // Add some demo notes if there are none
     if (store.getNotes().length === 0) {
         addDemoNotes();
@@ -53,25 +55,32 @@ function renderCurrentView() {
 
 // Add demo notes for initial state
 function addDemoNotes() {
-    // store.addNote({
-    //     id: 'note-1',
-    //     title: 'Welcome to Feynman AI: Your Study and Work Companion',
-    //     content: 'A powerful tool for transforming recordings and PDFs into organized notes using the Feynman technique.',
-    //     folderId: 'all',
-    //     createdAt: new Date('2024-11-09T15:08:00')
-    // });
-    
-    store.addNote({
-        id: 'note-2',
+
+    const welcomeNote = {
+        //id: 'note-1',
         title: 'Bem-vindo ao StudyBoost, a plataforma inteligente para seu aprendizado.',
         content: 'Uma ferramenta poderosa para transformar PDFs em notas organizadas usando a técnica de estudos.',
         folderId: 'all',
         createdAt: new Date('2024-11-07T10:15:00')
-    });
+    }
+
+    store.addNote(welcomeNote);
+
+    //mostra a nota de boas-vindas inicilamente
+    const notes = store.getNotes();
+    if (notes.length > 0) {
+        openNote(notes[0].id);
+    }
+}
+
+function showMainView() {
+    document.getElementById('noteContentContainer').classList.add('hidden');
+    document.getElementById('notes-container').classList.remove('hidden');
+    document.querySelector('.nova-nota-section').classList.remove('hidden');
 }
 
 // Initialize app when DOM is loaded
 document.addEventListener('DOMContentLoaded', initApp);
 
 // Export functions that might be needed by other modules
-export { renderCurrentView };
+export { renderCurrentView, showMainView };
