@@ -1,6 +1,6 @@
 // Main application file
 import { initSidebar } from './sidebar.js';
-import { initNotes, showNoteView } from './notes.js';
+import { initNotes, renderNotes, showNoteView } from './notes.js';
 import { initFolders } from './folders.js';
 import { initChatBot } from './chatbot.js';
 import { store } from './store.js';
@@ -27,6 +27,7 @@ function initApp() {
     
     // Event delegation for the entire app
     document.addEventListener('click', handleAppClicks);
+    
 }
 
 // Handle app-wide click events using event delegation
@@ -77,6 +78,12 @@ function showMainView() {
     document.getElementById('noteContentContainer').classList.add('hidden');
     document.getElementById('notes-container').classList.remove('hidden');
     document.querySelector('.nova-nota-section').classList.remove('hidden');
+
+    renderNotes();
+
+    document.querySelectorAll('.container__nota').forEach(el => el.classList.add('hidden'));
+    document.querySelector('.btn[data-target="notas"]').classList.add('notaActive');
+
 }
 
 // Initialize app when DOM is loaded
