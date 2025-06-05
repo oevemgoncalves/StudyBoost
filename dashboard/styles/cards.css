@@ -35,14 +35,17 @@
     margin-top: 10px;
 }
 
-/* modificação nos cards*/
+/* modificação nos cards/resumo no geral*/
 .container__nota__resumo {
+    display: flex;
+    flex-flow: column nowrap;
     width: 800px;
     margin: auto;
     margin-top: 30px;
+    list-style-position: inside;
 }
 
-h1 {
+.container__nota__resumo h1 {
     font-family: var(--cor-primaria);
     font-weight: 700;
     color: var(--cor-black);
@@ -50,6 +53,234 @@ h1 {
     line-height: 60px;
 }
 
+.container__nota__resumo h2 {
+    font-size: 1.5em;
+    font-weight: 600;
+    margin-top: 10px;
+    color: var(--cor-black);
+}
+
+.container__nota__resumo h3 {
+    margin-top: 10px;
+    color: var(--cor-black);
+}
+
+.container__nota__resumo p {
+    font-size: 1em;
+    line-height: 30px;
+    color: var(--cor-black);
+    margin-top: 10px;
+}
+
+
+.container__nota__resumo ul {
+    margin-left: 20px;
+    color: var(--cor-black);
+}
+
+.container__nota__resumo ul > li {
+    line-height: 1.5em;
+}
+
+
 .hidden {
     display: none;
 }
+
+/*flashcards*/
+.flashcards__container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px;
+    
+}
+
+.flashcards__title {
+    text-align: left;
+    max-width: 700px;
+    margin-bottom: 30px;
+}
+.card {
+    min-width: 700px;
+    height: 260px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 20px auto;
+    cursor: pointer;
+    perspective: 1000px;
+}
+
+.card-inner {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transition: transform 0.5s ease-in-out, opacity 0.4s ease;
+    transform-style: preserve-3d;
+}
+/*efeito de queda ao trocar cartao*/
+.card-inner.falling {
+  transform: translateY(-40px);
+  opacity: 0;
+}
+.card.flipped .card-inner {
+  transform: rotateY(180deg);
+}
+
+.card-front,
+.card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.2rem;
+  border: 1px solid #ccc;
+  border-radius: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  background-color: #f3f3f3;
+  text-align: center;
+  transform: rotateY(0deg); /* adiciona esta linha para a frente */
+}
+
+.card-back {
+  transform: rotateY(180deg); /* ou rotateX(180deg) se estiver usando eixo X */
+  background: #e6ffe6;
+}
+
+
+.hint {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: #666;
+}
+.controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 700px;
+    margin: 20px 10px;
+    gap: 10px;
+}
+.controls button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    background-color: #000;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+}
+.controls button:hover {
+    background-color: #333;
+}
+.counter {
+    font-size: 0.9rem;
+    color: #333;
+}
+
+
+/*QUIZZES*/
+.quiz__container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px;
+}
+.quiz-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 800px;
+    margin-bottom: 10px;
+}
+
+.quiz-container {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    padding: 2rem;
+    width: 100%;
+    max-width: 800px;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 6px;
+    background: #eee;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+}
+
+.progress {
+    height: 100%;
+    background-color: purple;
+    width: 0%;
+}
+
+.question {
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+}
+
+.options button {
+    display: block;
+    width: 100%;
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    background-color: #f2f2f2;
+    font-size: 1rem;
+    cursor: pointer;
+    text-align: left;
+}
+
+.options button.correct {
+    border-color: green;
+    background-color: #e0ffe0;
+}
+
+.options button.incorrect {
+    border-color: red;
+    background-color: #ffe0e0;
+}
+
+.next-btn {
+    display: none;
+    padding: 0.75rem 1.5rem;
+    background-color: black;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    float: right;
+    margin-top: 1rem;
+}
+
+.question-counter {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.control-btns button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    color: #333;
+    font-size: 1rem;
+}
+

@@ -117,28 +117,65 @@
             </div>
         </div>
 
+        <!-- 🔽 Aqui está o container da nota que foi movido para o local correto -->
         <div id="noteContentContainer" class="btn__card hidden">
             <div class="botoes">
                 <button class="btn notaActive" data-target="notas">Notas</button>
                 <button class="btn" data-target="quiz">Quiz</button>
                 <button class="btn" data-target="flashcards">Flashcards</button>
                 <button class="btn" data-target="audio">Áudio</button>
-
             </div>
+
             <section id="notas" class="container__nota">
                 <div class="container__nota__resumo">
-                    <h1>Bem-vindo ao StudyBoost, a plataforma inteligente para seu aprendizado.</h1>
-                    <p>Uma ferramenta poderosa para transformar gravações e PDFs em notas organizadas usando a técnicade estudos</p>
                 </div>
             </section>
+            <!-- novo -->
+            <section id="quiz" class="container__nota hidden quiz__container">
+                <div class="quiz-header">
+                    <div class="control-btns">
+                        <button id="resetBtn">🔁 Reiniciar</button>
+                        <button id="shuffleBtn">🔀 Embaralhar perguntas</button>
+                    </div>
+                </div>
 
-            <section id="quiz" class="container__nota hidden">Conteúdo do Quiz aqui...</section>
-            <section id="flashcards" class="container__nota hidden">Conteúdo de Flashcards aqui...</section>
+                <div class="quiz-container">
+                    <div class="progress-bar">
+                        <div class="progress" id="progress"></div>
+                    </div>
+                    <div id="question" class="question"></div>
+                    <div class="options" id="options"></div>
+                    <button class="next-btn" id="nextBtn">Próximo →</button>
+                    <div class="question-counter" id="counter"></div>
+                </div>
+            </section>
+            <!-- novo -->
+            <section id="flashcards" class="container__nota hidden flashcards__container">
+                <h2 class="flashcards__title"></h2>
+
+                <div id="card" class="card" onclick="flipCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <p id="card-content"></p>
+                        </div>
+                        <div class="card-back">
+                            <p id="card-back"></p>
+                        </div>
+                    </div>
+                </div>
+                <p class="hint" id="hint">🖐️ Pressione para virar</p>
+
+
+                <div class="controls">
+                    <button id="prev" onclick="prevCard()" style="visibility: hidden;">← Anterior</button>
+                    <span class="counter" id="counter">Cartão 1 de 16</span>
+                    <button id="next" onclick="nextCard()">Próximo →</button>
+                </div>
+            </section>
             <section id="audio" class="container__nota hidden">Conteúdo de Áudio aqui...</section>
 
         </div>
 
-        </div>
     </main>
 
     <!-- Chat Bot -->
