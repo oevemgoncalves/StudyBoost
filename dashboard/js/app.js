@@ -5,7 +5,8 @@ import { initFolders } from './folders.js';
 import { initChatBot } from './chatbot.js';
 import { store } from './store.js';
 import { initModalPdf } from './modal-pdf.js';
-import { initCards, initFlashcards, renderQuestion, nextQuestion, resetQuiz, shuffleQuestions } from './cards.js'; //novo
+import { initCards, initFlashcards, renderQuestion, nextQuestion, resetQuiz, shuffleQuestions } from './cards.js';
+import { initProfile } from './profile.js'; 
 
 // Initialize the application
 function initApp() {
@@ -16,8 +17,8 @@ function initApp() {
     initChatBot();
     initModalPdf();
     initCards();
-    initFlashcards(); //novo
-    //renderQuestion(); //novo
+    initFlashcards();
+    initProfile();
 
     // Add some demo notes if there are none
     if (store.getNotes().length === 0) {

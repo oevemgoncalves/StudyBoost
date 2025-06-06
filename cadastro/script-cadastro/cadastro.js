@@ -1,6 +1,7 @@
 // cadastro.js
 import { auth } from "../../firebase-config.js"; // Agora o auth existe!
 import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js"; // Atualize para v11.8.0
+import { updateProfile } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
 
 //autenticação de usuário
 document.getElementById("registerForm").addEventListener("submit", async function (event) {
@@ -10,6 +11,7 @@ document.getElementById("registerForm").addEventListener("submit", async functio
   let confirmPassword = document.getElementById("confirmPassword");
   let confirmContainer = confirmPassword.parentElement;
   let errorMessage = document.getElementById("error-message");
+  const displayName = document.getElementById("username").value.trim();
 
   if (password !== confirmPassword.value) {
     errorMessage.textContent = "As senhas não coincidem!";
@@ -35,9 +37,15 @@ document.getElementById("registerForm").addEventListener("submit", async functio
 
     // Prossegue se o e-mail for válido
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+
+    // Atualiza o nome do usuário
+    await updateProfile(auth.currentUser, {
+      displayName: displayName || email.split('@')[0]
+    });
+
     console.log("Usuário criado:", userCredential.user);
     alert("Cadastro realizado com sucesso!");
-    window.location.href = "../login/login.html";
+    window.location.href = "../../login/login.html"; // Redireciona para a página de login após o cadastro
   } catch (error) {
     console.error("Erro ao cadastrar:", error);
     errorMessage.textContent = "Erro: " + error.message;

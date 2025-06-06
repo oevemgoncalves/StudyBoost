@@ -11,6 +11,10 @@ let criarPastaBtn;
 let folderContainer;
 let btnCriarNovaPasta;
 let pastaFixa;
+let renameModal;
+let renameInput;
+let renameFolderId;
+let confirmMessage;
 
 function initFolders() {
     // Obtendo os elementos do DOM
@@ -40,7 +44,30 @@ function initFolders() {
             closeModal();
         }
     });
-    
+    //exluir pasta
+    renameModal = document.createElement('div');
+    renameModal.className = 'rename-modal';
+    renameModal.innerHTML = `
+        <div class="rename-modal-content">
+            <h2>Renomear Pasta</h2>
+            <input type="text" id="renameInput" placeholder="Novo nome da pasta">
+            <div class="rename-modal-actions">
+                <button id="cancelRenameBtn">Cancelar</button>
+                <button id="confirmRenameBtn">Salvar</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(renameModal);
+
+    renameInput = renameModal.querySelector('#renameInput');
+    renameModal.querySelector('#confirmRenameBtn').addEventListener('click', confirmRename);
+    renameModal.querySelector('#cancelRenameBtn').addEventListener('click', closeRenameModal);
+
+    confirmMessage = document.createElement('div');
+    confirmMessage.className = 'confirm-message';
+    confirmMessage.textContent = 'Pasta excluída com sucesso!';
+    document.body.appendChild(confirmMessage);
+
     // Subscribe to folder changes
     store.subscribe('folderChange', renderFolders);
     
@@ -96,46 +123,137 @@ function selectFolder(folderId) {
     renderCurrentView();
     renderNotes();
 }
-
+// renderFolder modificado para incluir os 3 pontos
 function renderFolders() {
-    // Seleciona todas as pastas, exceto a fixa
     const folders = store.getFolders().filter(folder => !folder.isFixed);
-    
-    // Limpar contêiner de pasta
     folderContainer.innerHTML = '';
-    
-    // Adicione cada pasta ao contêiner
+
     folders.forEach(folder => {
         const folderEl = document.createElement('div');
         folderEl.className = 'folder';
         folderEl.setAttribute('data-id', folder.id);
         
+        const folderContent = document.createElement('div');
+        folderContent.className = 'folder-content';
+        folderContent.style.display = 'flex';
+        folderContent.style.alignItems = 'center';
+        folderContent.style.width = '100%';
+
         const icon = document.createElement('i');
         icon.className = 'fa-regular fa-folder-closed';
         
         const name = document.createElement('span');
         name.textContent = folder.name;
+        name.style.flexGrow = '1';
         
-        folderEl.appendChild(icon);
-        folderEl.appendChild(name);
+        const menu = document.createElement('div');
+        menu.className = 'folder-menu';
         
-        folderEl.addEventListener('click', () => selectFolder(folder.id));
+        const menuBtn = document.createElement('button');
+        menuBtn.className = 'folder-menu-btn';
+        menuBtn.innerHTML = '<i class="fa-solid fa-ellipsis-vertical"></i>';
+        
+        const menuOptions = document.createElement('div');
+        menuOptions.className = 'folder-menu-options';
+        
+        const renameOption = document.createElement('div');
+        renameOption.className = 'folder-menu-option';
+        renameOption.innerHTML = '<i class="fa-regular fa-pen-to-square"></i> Renomear';
+        renameOption.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openRenameModal(folder.id, folder.name);
+            menuOptions.classList.remove('show');
+        });
+        
+        const deleteOption = document.createElement('div');
+        deleteOption.className = 'folder-menu-option';
+        deleteOption.innerHTML = '<i class="fa-regular fa-trash-can"></i> Excluir';
+        deleteOption.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            if (confirm(`Tem certeza que deseja excluir a pasta "${folder.name}" e todas as suas notas?`)) {
+                await store.deleteFolder(folder.id);
+                showConfirmMessage();
+            }
+            menuOptions.classList.remove('show');
+        });
+        
+        menuOptions.appendChild(renameOption);
+        menuOptions.appendChild(deleteOption);
+        menu.appendChild(menuBtn);
+        menu.appendChild(menuOptions);
+        
+        menuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            menuOptions.classList.toggle('show');
+        });
+        
+        folderContent.appendChild(icon);
+        folderContent.appendChild(name);
+        folderEl.appendChild(folderContent);
+        folderEl.appendChild(menu);
+        
+        folderEl.addEventListener('click', () => {
+            document.querySelectorAll('.folder-menu-options').forEach(opt => {
+                opt.classList.remove('show');
+            });
+            selectFolder(folder.id);
+        });
         
         folderContainer.appendChild(folderEl);
     });
-    
+
     // Atualizar UI da pasta ativa
     const activeFolder = store.getActiveFolder();
     document.querySelectorAll('.folder').forEach(folderEl => {
         const folderId = folderEl.getAttribute('data-id');
-        if (folderId === activeFolder.id) {
-            folderEl.classList.add('active');
-            folderEl.querySelector('i').className = 'fa-regular fa-folder-open';
-        } else {
-            folderEl.classList.remove('active');
-            folderEl.querySelector('i').className = 'fa-regular fa-folder-closed';
+        const isActive = folderId === activeFolder.id;
+        
+        folderEl.classList.toggle('active', isActive);
+        const icon = folderEl.querySelector('i');
+        if (icon) {
+            icon.className = isActive ? 'fa-regular fa-folder-open' : 'fa-regular fa-folder-closed';
         }
     });
+
+    // Fechar menus ao clicar fora
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.folder-menu-btn')) {
+            document.querySelectorAll('.folder-menu-options').forEach(opt => {
+                opt.classList.remove('show');
+            });
+        }
+    });
+
+}
+
+//novas funcçoes para renomear e excluir pastas
+function openRenameModal(folderId, currentName) {
+    renameFolderId = folderId;
+    renameInput.value = currentName;
+    renameModal.classList.add('active');
+    renameInput.focus();
+}
+
+function closeRenameModal() {
+    renameModal.classList.remove('active');
+}
+
+function confirmRename() {
+    const newName = renameInput.value.trim();
+    if (newName) {
+        const folder = store.getFolders().find(f => f.id === renameFolderId);
+        if (folder) {
+            store.updateFolder(renameFolderId, { name: newName });
+            closeRenameModal();
+        }
+    }
+}
+
+function showConfirmMessage() {
+    confirmMessage.classList.add('show');
+    setTimeout(() => {
+        confirmMessage.classList.remove('show');
+    }, 3000);
 }
 
 export { initFolders };

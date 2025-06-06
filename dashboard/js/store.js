@@ -91,20 +91,27 @@ const store = (() => {
     
     // excluindo uma nova pasta e suas notas
     function deleteFolder(folderId) {
-        // Não é possível excluir a pasta corrigida
-        if (folderId === 'all') return false;
-        
-        // exclua a pasta
-        state.folders = state.folders.filter(folder => folder.id !== folderId);
-        
-        // Defina a pasta ativa como 'todos' se a pasta excluída estiver ativa
-        if (state.activeFolder.id === folderId) {
-            setActiveFolder('all');
-        }
-        
-        notify('folderChange');
-        return true;
+    if (folderId === 'all') return false;
+    
+    // Verifique se a pasta existe
+    const folderExists = state.folders.some(f => f.id === folderId);
+    if (!folderExists) return false;
+    
+    // exclua a pasta
+    state.folders = state.folders.filter(folder => folder.id !== folderId);
+    
+    // exclua as notas da pasta
+    state.notes = state.notes.filter(note => note.folderId !== folderId);
+    
+    // Defina a pasta ativa como 'todos' se a pasta excluída estiver ativa
+    if (state.activeFolder.id === folderId) {
+        setActiveFolder('all');
     }
+    
+    notify('folderChange');
+    notify('noteChange');
+    return true;
+}
     
     // Defina a pasta ativa
     function setActiveFolder(folderId) {
@@ -176,6 +183,21 @@ const store = (() => {
         subscribe('folderChange', saveToStorage);
         subscribe('activeFolderChange', saveToStorage);
     }
+
+    function updateFolder(folderId, updates) {
+    state.folders = state.folders.map(folder => 
+        folder.id === folderId ? { ...folder, ...updates } : folder
+    );
+    notify('folderChange');
+    
+    // Se a pasta atualizada é a pasta ativa, atualize também
+    if (state.activeFolder.id === folderId) {
+        state.activeFolder = { ...state.activeFolder, ...updates };
+        notify('activeFolderChange');
+    }
+    
+    return true;
+}
     
     // Inicializar o armazenamento quando o módulo for carregado
     init();
@@ -186,6 +208,7 @@ const store = (() => {
         getNotesByFolder,
         addNote,
         updateNote,
+        updateFolder,
         deleteNote,
         getFolders,
         addFolder,
