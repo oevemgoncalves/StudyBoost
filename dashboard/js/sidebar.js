@@ -1,3 +1,4 @@
+import { showMainView } from './app.js';
 function initSidebar() {
     const sidebar = document.querySelector('.sidebar');
     const arrow = document.getElementById('toggleArrow');

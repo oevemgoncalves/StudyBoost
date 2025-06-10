@@ -61,14 +61,20 @@
             <i class="fa-solid fa-arrow-up-from-bracket"></i>
             <h2>Baixar PDF</h2>
 
-            <label class="upload-area" for="fileInput">
-                <span id="uploadText">Clique para baixar seu arquivo PDF</span>
+            <label class="upload-area" id="uploadArea" for="fileInput">
+                <span id="uploadText">Clique para selecionar seu arquivo PDF</span>
             </label>
 
-            <input type="file" id="fileInput" accept=".pdf" onchange="handleFileUpload(event)" />
+            <input type="file" id="fileInput" accept=".pdf" />
 
-            <button class="btn__gerar__nota" id="btnGerarNota" onclick="gerarNota()">Gerar Nota</button>
-        </div>
+            <!-- Área de ações após seleção -->
+            <div id="pdfActions" class="hidden">
+                <button id="viewPdfBtn" class="btn__visualizar__pdf">Visualizar PDF</button>
+                <button id="removePdfBtn" class="btn__remover__pdf">Remover PDF</button>
+            </div>
+
+            <button class="btn__gerar__nota" id="btnGerarNota">Gerar Nota</button>
+</div>
     </div>
 
     <!-- Botão seta (apenas visível no mobile) -->

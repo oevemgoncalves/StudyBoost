@@ -1,7 +1,20 @@
 // gerenciamento de pastas
-import { store } from './store.js';
-import { renderCurrentView } from './app.js';
-import { showMainView } from './app.js';
+import { auth } from '../../firebase-config.js';
+import {
+  createFolder as createFolderFirebase,
+  createWelcomeNoteIfNeeded,
+  getFolders,
+  deleteFolder,
+  updateFolder
+} from '../../firebase-service.js';
+
+import { db } from '../../firebase-config.js';
+import {
+  deleteDoc,
+  doc
+} from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
+
+import { renderCurrentView, showMainView } from './app.js';
 import { renderNotes } from './notes.js';
 
 // elementos do DOM (variaves)
@@ -15,6 +28,8 @@ let renameModal;
 let renameInput;
 let renameFolderId;
 let confirmMessage;
+let currentUserUid = null;
+let activeFolderId = null; // Variável para armazenar a pasta ativa 
 
 function initFolders() {
     // Obtendo os elementos do DOM
@@ -68,11 +83,23 @@ function initFolders() {
     confirmMessage.textContent = 'Pasta excluída com sucesso!';
     document.body.appendChild(confirmMessage);
 
-    // Subscribe to folder changes
-    store.subscribe('folderChange', renderFolders);
-    
-    // Renderização inicial
-    renderFolders();
+    // 🔁 Agora carregamos as pastas do Firebase
+    auth.onAuthStateChanged(async (user) => {
+        if (user) {
+            currentUserUid = user.uid; // ⬅️ Salva o UID globalmente
+            await createWelcomeNoteIfNeeded(currentUserUid);
+            const pastas = await getFolders(currentUserUid);
+
+            activeFolderId = 'all';
+            renderFolders(pastas);
+            showMainView();
+        } else {
+            alert('Usuário não autenticado.');
+            // Redireciona pra login se quiser
+            // window.location.href = "/login.html";
+        }
+    });
+
 }
 
 function openModal() {
@@ -97,38 +124,45 @@ function closeModal() {
     }, 300);
 }
 
-function createFolder() {
+async function createFolder() {
     const folderName = pastaInput.value.trim();
-    
+
     if (!folderName) {
         alert('Por favor, insira um nome para a pasta');
         return;
     }
-    
-    // Adiciona a pasta ao armazenamento (navegador)
-    const newFolder = store.addFolder({
-        name: folderName
-    });
-    
-    // selecionar a nova pasta
-    selectFolder(newFolder.id);
-    
-    // fecha o modal
-    closeModal();
+
+    if (!currentUserUid) {
+        alert('Usuário não autenticado.');
+        return;
+    }
+
+
+    try {
+        // Cria no Firestore
+        const newFolder = await createFolderFirebase(currentUserUid, folderName);
+        const pastas = await getFolders(currentUserUid);
+        renderFolders(pastas);
+        selectFolder(newFolder.id);
+
+        closeModal();
+    } catch (error) {
+        console.error("Erro ao criar pasta:", error);
+        alert("Erro ao criar pasta. Tente novamente.");
+    }
 }
 
+
 function selectFolder(folderId) {
-    store.setActiveFolder(folderId);
+    activeFolderId = folderId;
     showMainView(); // Mostra a view principal
-    renderCurrentView();
-    renderNotes();
 }
 // renderFolder modificado para incluir os 3 pontos
-function renderFolders() {
-    const folders = store.getFolders().filter(folder => !folder.isFixed);
+function renderFolders(folders) {
     folderContainer.innerHTML = '';
 
     folders.forEach(folder => {
+        console.log("Criando elemento para pasta:", folder.name);
         const folderEl = document.createElement('div');
         folderEl.className = 'folder';
         folderEl.setAttribute('data-id', folder.id);
@@ -171,11 +205,38 @@ function renderFolders() {
         deleteOption.addEventListener('click', async (e) => {
             e.stopPropagation();
             if (confirm(`Tem certeza que deseja excluir a pasta "${folder.name}" e todas as suas notas?`)) {
-                await store.deleteFolder(folder.id);
-                showConfirmMessage();
+                try {
+                    // Buscar todas as notas dessa pasta
+                    const notes = await getNotes(currentUserUid, folder.id);
+
+                    // Excluir cada nota
+                    for (const note of notes) {
+                        const noteRef = doc(db, 'users', currentUserUid, 'notes', note.id);
+                        await deleteDoc(noteRef);
+                    }
+
+                    // Excluir a pasta
+                    await deleteFolder(currentUserUid, folder.id);
+
+                    // Atualiza visualmente
+                    const pastasAtualizadas = await getFolders(currentUserUid);
+                    renderFolders(pastasAtualizadas);
+
+                    // Se a pasta ativa era a que foi deletada, volta para "all"
+                    if (activeFolderId === folder.id) {
+                        activeFolderId = 'all';
+                    }
+
+                    showMainView(); // atualiza as notas também
+                } catch (error) {
+                    console.error("Erro ao excluir pasta e notas:", error);
+                    alert("Erro ao excluir pasta.");
+                }
             }
+
             menuOptions.classList.remove('show');
         });
+
         
         menuOptions.appendChild(renameOption);
         menuOptions.appendChild(deleteOption);
@@ -203,17 +264,17 @@ function renderFolders() {
     });
 
     // Atualizar UI da pasta ativa
-    const activeFolder = store.getActiveFolder();
     document.querySelectorAll('.folder').forEach(folderEl => {
         const folderId = folderEl.getAttribute('data-id');
-        const isActive = folderId === activeFolder.id;
-        
+        const isActive = folderId === activeFolderId;
+
         folderEl.classList.toggle('active', isActive);
         const icon = folderEl.querySelector('i');
         if (icon) {
             icon.className = isActive ? 'fa-regular fa-folder-open' : 'fa-regular fa-folder-closed';
         }
     });
+
 
     // Fechar menus ao clicar fora
     document.addEventListener('click', (e) => {
@@ -238,16 +299,22 @@ function closeRenameModal() {
     renameModal.classList.remove('active');
 }
 
-function confirmRename() {
+async function confirmRename() {
     const newName = renameInput.value.trim();
-    if (newName) {
-        const folder = store.getFolders().find(f => f.id === renameFolderId);
-        if (folder) {
-            store.updateFolder(renameFolderId, { name: newName });
+
+    if (newName && currentUserUid && renameFolderId) {
+        try {
+            await updateFolder(currentUserUid, renameFolderId, { name: newName });
+            const pastas = await getFolders(currentUserUid);
+            renderFolders(pastas);
             closeRenameModal();
+        } catch (err) {
+            console.error("Erro ao renomear pasta:", err);
+            alert("Erro ao renomear pasta.");
         }
     }
 }
+
 
 function showConfirmMessage() {
     confirmMessage.classList.add('show');
@@ -256,4 +323,4 @@ function showConfirmMessage() {
     }, 3000);
 }
 
-export { initFolders };
+export { initFolders, activeFolderId, currentUserUid };

@@ -1,7 +1,8 @@
 // Main application file
+import { getFolders } from '../../firebase-service.js';
 import { initSidebar } from './sidebar.js';
 import { initNotes, renderNotes, showNoteView } from './notes.js';
-import { initFolders } from './folders.js';
+import { initFolders, activeFolderId, currentUserUid } from './folders.js';
 import { initChatBot } from './chatbot.js';
 import { store } from './store.js';
 import { initModalPdf } from './modal-pdf.js';
@@ -45,21 +46,29 @@ function handleAppClicks(event) {
 
 // Render the current view based on active folder
 function renderCurrentView() {
-    const activeFolder = store.getActiveFolder();
-    document.getElementById('currentFolder').textContent = activeFolder.name;
+    // Atualiza o nome da pasta atual no topo
+    const activeName = activeFolderId === 'all' ? 'Todas as Pastas' : getFolderNameById(activeFolderId);
+    document.getElementById('currentFolder').textContent = activeName;
 
-    // Update folder UI in sidebar
+    // Atualiza a UI visual da sidebar
     const allFolders = document.querySelectorAll('.folder');
     allFolders.forEach(folder => {
-        folder.classList.remove('active');
         const folderId = folder.getAttribute('data-id');
-        if (folderId === activeFolder.id) {
-            folder.classList.add('active');
-            folder.querySelector('i').className = 'fa-regular fa-folder-open';
-        } else {
-            folder.querySelector('i').className = 'fa-regular fa-folder-closed';
+        const isActive = folderId === activeFolderId;
+
+        folder.classList.toggle('active', isActive);
+        const icon = folder.querySelector('i');
+        if (icon) {
+            icon.className = isActive ? 'fa-regular fa-folder-open' : 'fa-regular fa-folder-closed';
         }
     });
+}
+
+function getFolderNameById(id) {
+    // Isso deve ser assíncrono, mas como estamos usando o nome apenas visualmente,
+    // podemos armazenar localmente os nomes em outro momento.
+    // Aqui retornamos "Pasta" como fallback
+    return "Pasta";
 }
 
 // Add demo notes for initial state
