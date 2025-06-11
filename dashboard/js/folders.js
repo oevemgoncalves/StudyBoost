@@ -153,8 +153,9 @@ async function createFolder() {
 }
 
 
-function selectFolder(folderId) {
+async function selectFolder(folderId) {
     activeFolderId = folderId;
+    await renderCurrentView(); // Atualiza o nome no topo
     showMainView(); // Mostra a view principal
 }
 // renderFolder modificado para incluir os 3 pontos
@@ -323,4 +324,14 @@ function showConfirmMessage() {
     }, 3000);
 }
 
-export { initFolders, activeFolderId, currentUserUid };
+// No final de folders.js, adicione:
+async function getFolderNameById(folderId) {
+    if (folderId === 'all') return 'Todas as Notas';
+    
+    const folders = await getFolders(currentUserUid);
+    const folder = folders.find(f => f.id === folderId);
+    return folder ? folder.name : 'Pasta';
+}
+
+
+export { initFolders, activeFolderId, currentUserUid, getFolderNameById };

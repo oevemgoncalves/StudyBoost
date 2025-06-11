@@ -1,9 +1,9 @@
 // Gerenciamento de notas
 import { store } from './store.js';
 import { getNotes, createNote, getNoteById, deleteNote as deleteNoteFirebase } from '../../firebase-service.js';
-import { currentUserUid } from './folders.js'; // exporte ela se ainda não estiver
+//import { currentUserUid } from './folders.js'; // exporte ela se ainda não estiver
 import { showMainView } from './app.js';
-import { activeFolderId } from './folders.js';
+import { activeFolderId, currentUserUid } from './folders.js';
 
 // elemento DOM
 let notesContainer;
@@ -61,9 +61,12 @@ function createNoteElement(note) {
     const title = document.createElement('h3');
     title.className = 'note-title';
     title.textContent = note.title;
-    //novo
+
     const content = document.createElement('div');
     content.className = 'note-content';
+
+     // Mostra o início do resumo para notas PDF
+    content.textContent = note.content.slice(0, 200) + (note.content.length > 200 ? '...' : '');
 
     if (note.isWelcome) {
         content.textContent = 'Transforme PDFs em resumos, flashcards, quizzes e Aúdios com IA.';

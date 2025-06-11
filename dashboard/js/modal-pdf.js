@@ -1,7 +1,8 @@
 // modal-pdf.js
 import { createNote } from '../../firebase-service.js';
 import { activeFolderId, currentUserUid } from './folders.js';
-import { uploadPdfToCloudinary } from '../../upload-service.js';
+import { renderNotes } from './notes.js';
+//import { uploadPdfToCloudinary } from '../../upload-service.js';
 
 function initModalPdf() {
     const modalPDF = document.getElementById('container__principal__modal__pdf');
@@ -16,8 +17,9 @@ function initModalPdf() {
     const uploadArea = document.getElementById('uploadArea');
     const uploadText = document.getElementById('uploadText');
     const modalContainer = document.querySelector('.container__modal-pdf');
+    const pdfActions = document.getElementById('pdfActions');
     let selectedFile = null;
-    
+
 
 
     if (!modalPDF || !openBtn || !closeBtn || !fileInput || !gerarNotaBtn) {
@@ -32,7 +34,7 @@ function initModalPdf() {
         document.body.classList.add('modal-open');
     });
 
-    // Fechar o modal
+    //Fechar o modal
     closeBtn.addEventListener('click', () => {
         resetFileInput();
         modalPDF.classList.remove('active');
@@ -79,6 +81,7 @@ function initModalPdf() {
 
     // Atualize também o fechamento do modal
     closeBtn.addEventListener('click', () => {
+        resetFileInput();
         if (pdfPreview.src) {
             URL.revokeObjectURL(pdfPreview.src);
         }
@@ -112,37 +115,74 @@ function initModalPdf() {
             return;
         }
 
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('upload_preset', 'pdf_unsigned');
-        //formData.append('resource_type', 'raw');
+        gerarNotaBtn.disabled = true;
+        gerarNotaBtn.textContent = 'Processando...';
 
-        const cloudRes = await fetch('https://api.cloudinary.com/v1_1/dyqp5onvs/raw/upload',)
-
-        // Substitua o bloco try-catch por:
         try {
-            const { url } = await uploadPdfToCloudinary(file);
+            // 1. Upload para Cloudinary
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('upload_preset', 'pdf_unsigned');
 
+            const cloudinaryResponse = await fetch('https://api.cloudinary.com/v1_1/dyqp5onvs/raw/upload', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!cloudinaryResponse.ok) {
+                throw new Error('Falha no upload para Cloudinary');
+            }
+
+            const cloudinaryData = await cloudinaryResponse.json();
+            const pdfUrl = cloudinaryData.secure_url;
+            console.log("PDF enviado com sucesso:", pdfUrl);
+
+            // 2. Chamar o backend para gerar resumo com IA
+            const resumoRes = await fetch("http://127.0.0.1:8000/gerar-resumo", {
+                method: "POST",
+                mode: "cors",  // Adicione esta linha
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"  // Adicione esta linha
+                },
+                body: JSON.stringify({ pdf_url: pdfUrl })
+            });
+
+            console.log("Resposta recebida:", resumoRes);
+            if (!resumoRes.ok) {
+                const errorText = await resumoRes.text();
+                console.error("Erro detalhado:", errorText);
+                throw new Error(`Erro ${resumoRes.status}: ${errorText}`);
+            }
+
+            const resumoData = await resumoRes.json();
+
+            // 3. Criar nota no Firebase
             const note = {
                 title: file.name.replace(/\.pdf$/i, ''),
-                content: `PDF disponível em: ${url}`,
+                content: resumoData.resumo,
                 folderId: activeFolderId,
-                pdfUrl: url,
-                pdfPublicId: data.public_id,
+                pdfUrl: pdfUrl,
                 createdAt: new Date(),
                 isPdf: true
             };
 
             await createNote(currentUserUid, note);
-            alert("PDF enviado e nota criada!");
-            
-            fileInput.value = '';
+
+            // 4. Fechar modal e atualizar a lista de notas
             closeBtn.click();
+            renderNotes(); // Atualiza a lista de notas
+
         } catch (err) {
-            console.error('Erro ao fazer upload do PDF:', err);
-            alert('Erro ao fazer upload: ' + err.message);
+            console.error('Erro ao processar PDF:', err);
+            alert('Erro: ' + (err.message || 'Ocorreu um erro ao processar o PDF'));
+        } finally {
+            gerarNotaBtn.disabled = false;
+            gerarNotaBtn.textContent = 'Gerar Nota';
         }
     });
 }
+
+//}
 
 export { initModalPdf };
