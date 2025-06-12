@@ -10,16 +10,32 @@ let notesContainer;
 
 function initNotes() {
     notesContainer = document.getElementById('notes-container');
-    //renderNotes();
+    if (!notesContainer) {
+        console.error('Elemento notes-container não encontrado no DOM');
+        return false;
+    }
+    return true;
 }
 
 async function renderNotes() {
+    if (!notesContainer) {
+        console.error('notesContainer não inicializado - chamar initNotes() primeiro');
+        return;
+    }
+    
+    if (!currentUserUid) {
+        console.log("Aguardando autenticação para renderizar notas...");
+        return;
+    }
+    
     console.log("🔥 renderNotes chamado em:", new Error().stack);
 
-
-    notesContainer.classList.remove('hidden'); // Mostra container se estiver oculto
-    notesContainer.innerHTML = ''; // Limpa o container antes de renderizar novas notas
-
+    try {
+        notesContainer.classList.remove('hidden'); // Mostra container se estiver oculto
+        notesContainer.innerHTML = ''; // Limpa o container antes de renderizar novas notas
+    } catch (error) {
+        console.error('Erro ao renderizar notas:', error);
+    }
     if (!activeFolderId || !currentUserUid) return;
 
     console.log("🔄 Buscando notas da pasta:", activeFolderId);
@@ -134,47 +150,49 @@ function createNoteElement(note) {
 }
 
 function renderEmptyState() {
-    notesContainer.innerHTML = ''; // Limpa antes de renderizar
+    if (!notesContainer) return;
+    
+    notesContainer.innerHTML = '';
     const emptyEl = document.createElement('div');
     emptyEl.className = 'empty-notes';
-
+    
     const message = document.createElement('p');
     message.textContent = 'Nenhuma nota encontrada nesta pasta.';
-
     emptyEl.appendChild(message);
-
-    // 👉 Só exibe botão se NÃO estiver na pasta "all"
-    // if (activeFolderId !== 'all') {
-    //     const createButton = document.createElement('button');
-    //     createButton.textContent = 'Criar nova nota';
-    //     createButton.addEventListener('click', createNewNote);
-    //     emptyEl.appendChild(createButton);
-    // }
-
+    
     notesContainer.appendChild(emptyEl);
 }
 
 // Modifique a função openNote
 async function openNote(noteId) {
-    const note = await getNoteById(currentUserUid, noteId);
+    try {
+        const note = await getNoteById(currentUserUid, noteId);
+        if (!note) {
+            alert("Nota não encontrada!");
+            return;
+        }
 
-    if (note) {
-        document.querySelector('#notas .container__nota__resumo').innerHTML = `
-            <h1>${note.title}</h1>
-            <p>${note.content}</p>
-        `;
+        const resumoContainer = document.querySelector('#notas .container__nota__resumo');
+        if (resumoContainer) {
+            resumoContainer.innerHTML = `
+                <h1>${note.title}</h1>
+                <div>${note.content}</div>
+            `;
+        }
 
-        document.getElementById('noteContentContainer').classList.remove('hidden');
-        document.querySelector('.nova-nota-section').classList.add('hidden');
-        document.getElementById('notes-container').classList.add('hidden');
+        // Atualização segura da UI
+        document.getElementById('noteContentContainer')?.classList.remove('hidden');
+        document.querySelector('.nova-nota-section')?.classList.add('hidden');
+        document.getElementById('notes-container')?.classList.add('hidden');
 
         document.querySelectorAll(".container__nota").forEach(sec => sec.classList.add("hidden"));
-        document.getElementById("notas").classList.remove("hidden");
+        document.getElementById("notas")?.classList.remove("hidden");
 
         document.querySelectorAll(".btn").forEach(btn => btn.classList.remove("notaActive"));
-        document.querySelector('.btn[data-target="notas"]').classList.add("notaActive");
-    } else {
-        alert("Nota não encontrada!");
+        document.querySelector('.btn[data-target="notas"]')?.classList.add("notaActive");
+    } catch (error) {
+        console.error('Erro ao abrir nota:', error);
+        alert("Erro ao carregar a nota");
     }
 }
 

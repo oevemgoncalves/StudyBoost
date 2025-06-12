@@ -32,7 +32,7 @@ let confirmMessage;
 let currentUserUid = null;
 let activeFolderId = null; // Variável para armazenar a pasta ativa 
 
-function initFolders() {
+async function initFolders() {
     // Obtendo os elementos do DOM
     modal = document.getElementById('modal');
     pastaInput = document.getElementById('pastaNome');
@@ -85,23 +85,28 @@ function initFolders() {
     document.body.appendChild(confirmMessage);
 
     // 🔁 Agora carregamos as pastas do Firebase
-    auth.onAuthStateChanged(async (user) => {
-        if (user) {
-            currentUserUid = user.uid; // ⬅️ Salva o UID globalmente
-            await createWelcomeNoteIfNeeded(currentUserUid);
-            const pastas = await getFolders(currentUserUid);
+    return new Promise((resolve) => {
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                currentUserUid = user.uid;
+                console.log("Usuário autenticado:", currentUserUid); 
+        
+                await createWelcomeNoteIfNeeded(currentUserUid);
+                const pastas = await getFolders(currentUserUid);
 
-            activeFolderId = 'all';
-            renderFolders(pastas);
-            showMainView();
+                activeFolderId = 'all';
+                renderFolders(pastas);
+                showMainView();
 
             // ✅ Agora é seguro iniciar o modal de upload
             initModalPdf();  
-        } else {
-            alert('Usuário não autenticado.');
-            // Redireciona pra login se quiser
-            // window.location.href = "/login.html";
-        }
+            resolve();
+            } else {
+                console.log("Usuário não autenticado");
+                resolve();
+            }
+        });
+
     });
 
 }
@@ -338,4 +343,9 @@ async function getFolderNameById(folderId) {
 }
 
 
-export { initFolders, activeFolderId, currentUserUid, getFolderNameById };
+export { 
+  initFolders,
+  activeFolderId, 
+  currentUserUid, 
+  getFolderNameById 
+};
