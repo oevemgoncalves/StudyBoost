@@ -18,17 +18,25 @@ function initNotes() {
 }
 
 async function renderNotes() {
+    if (!currentUserUid || !activeFolderId) {
+        console.warn("⚠️ renderNotes não continuará porque currentUserUid ou activeFolderId está indefinido.");
+        return;
+    }
+
     if (!notesContainer) {
         console.error('notesContainer não inicializado - chamar initNotes() primeiro');
         return;
     }
-    
+
     if (!currentUserUid) {
         console.log("Aguardando autenticação para renderizar notas...");
         return;
     }
-    
-    console.log("🔥 renderNotes chamado em:", new Error().stack);
+
+    console.log("🔥 renderNotes foi chamado com:", {
+        currentUserUid,
+        activeFolderId
+    });
 
     try {
         notesContainer.classList.remove('hidden'); // Mostra container se estiver oculto

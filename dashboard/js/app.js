@@ -2,7 +2,7 @@
 import { getFolders } from '../../firebase-service.js';
 import { initSidebar } from './sidebar.js';
 import { initNotes, renderNotes } from './notes.js';
-import { initFolders, getFolderNameById } from './folders.js';
+import { initFolders, getFolderNameById, activeFolderId } from './folders.js';
 import { initChatBot } from './chatbot.js';
 import { initModalPdf } from './modal-pdf.js';
 import { initCards, initFlashcards, renderQuestion, nextQuestion, resetQuiz, shuffleQuestions } from './cards.js';
@@ -56,8 +56,10 @@ function getCurrentUserUid() {
 
 // Render the current view based on active folder
 async function renderCurrentView() {
-    const activeFolderId = 'all'; // Ou obtenha de onde você armazena isso
-    const activeName = activeFolderId === 'all' ? 'Todas as Pastas' : await getFolderNameById(activeFolderId);
+    const activeName = activeFolderId === 'all'
+        ? 'Todas as Pastas'
+        : await getFolderNameById(activeFolderId);
+
     document.getElementById('currentFolder').textContent = activeName || 'Carregando...';
 
     // Atualiza a UI visual da sidebar
