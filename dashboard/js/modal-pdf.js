@@ -129,33 +129,45 @@ function initModalPdf() {
                 body: formData
             });
 
-            if (!cloudinaryResponse.ok) {
-                throw new Error('Falha no upload para Cloudinary');
+            const cloudinaryData = await cloudinaryResponse.json();
+
+            if (!cloudinaryData.secure_url) {
+                throw new Error("Não foi possível obter a URL do PDF do Cloudinary.");
             }
 
-            const cloudinaryData = await cloudinaryResponse.json();
             const pdfUrl = cloudinaryData.secure_url;
-            console.log("PDF enviado com sucesso:", pdfUrl);
+            console.log("📤 PDF enviado para Cloudinary:", pdfUrl);
 
-            // 2. Chamar o backend para gerar resumo com IA
+            // 2. Chamada para o back-end com a URL do PDF
             const resumoRes = await fetch("http://127.0.0.1:8000/gerar-resumo", {
                 method: "POST",
-                mode: "cors",  // Adicione esta linha
+                mode: "cors",
                 headers: {
                     "Content-Type": "application/json",
-                    "Accept": "application/json"  // Adicione esta linha
+                    "Accept": "application/json"
                 },
                 body: JSON.stringify({ pdf_url: pdfUrl })
             });
 
-            console.log("Resposta recebida:", resumoRes);
+            console.log("Status da resposta:", resumoRes.status);
+            let resumoData;
+
             if (!resumoRes.ok) {
-                const errorText = await resumoRes.text();
-                console.error("Erro detalhado:", errorText);
-                throw new Error(`Erro ${resumoRes.status}: ${errorText}`);
+                const erroTexto = await resumoRes.text();
+                throw new Error(`Erro HTTP ${resumoRes.status}: ${erroTexto}`);
             }
 
-            const resumoData = await resumoRes.json();
+            try {
+                resumoData = await resumoRes.json();
+                console.log("✅ Resumo recebido da IA:", resumoData);
+            } catch (jsonErr) {
+                const textoBruto = await resumoRes.text();
+                console.error("❌ Erro ao converter para JSON:", jsonErr);
+                console.log("⚠️ Conteúdo bruto da resposta:", textoBruto);
+                throw new Error("Erro ao interpretar resposta da IA");
+            }
+
+            console.log("Resumo recebido da IA:", resumoData);
 
             // 3. Criar nota no Firebase
             const note = {
@@ -164,22 +176,33 @@ function initModalPdf() {
                 folderId: activeFolderId,
                 pdfUrl: pdfUrl,
                 createdAt: new Date(),
-                isPdf: true
+                isPdf: true,
+                isWelcome: false
             };
 
             await createNote(currentUserUid, note);
-
-            // 4. Fechar modal e atualizar a lista de notas
             closeBtn.click();
-            renderNotes(); // Atualiza a lista de notas
+            console.log("👤 UID do usuário atual:", currentUserUid);
+
+            renderNotes();
 
         } catch (err) {
-            console.error('Erro ao processar PDF:', err);
-            alert('Erro: ' + (err.message || 'Ocorreu um erro ao processar o PDF'));
+            console.error("❌ Erro ao processar PDF:", err);
+
+            if (err instanceof SyntaxError) {
+                console.log("🔎 Isso parece um erro de JSON.parse()");
+            } else if (err instanceof TypeError) {
+                console.log("🚫 Erro de conexão com o back-end (fetch falhou?)");
+            }
+
+            alert("Erro: " + (err.message || err.toString() || "Erro desconhecido"));
+
         } finally {
             gerarNotaBtn.disabled = false;
             gerarNotaBtn.textContent = 'Gerar Nota';
         }
+
+
     });
 }
 

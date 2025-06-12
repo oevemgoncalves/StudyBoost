@@ -15,7 +15,8 @@ import {
 } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
 
 import { renderCurrentView, showMainView } from './app.js';
-import { renderNotes } from './notes.js';
+import { initModalPdf } from './modal-pdf.js';
+//import { renderNotes } from './notes.js';
 
 // elementos do DOM (variaves)
 let modal;
@@ -93,6 +94,9 @@ function initFolders() {
             activeFolderId = 'all';
             renderFolders(pastas);
             showMainView();
+
+            // ✅ Agora é seguro iniciar o modal de upload
+            initModalPdf();  
         } else {
             alert('Usuário não autenticado.');
             // Redireciona pra login se quiser

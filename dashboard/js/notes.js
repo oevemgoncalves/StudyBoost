@@ -1,5 +1,5 @@
 // Gerenciamento de notas
-import { store } from './store.js';
+//import { store } from './store.js';
 import { getNotes, createNote, getNoteById, deleteNote as deleteNoteFirebase } from '../../firebase-service.js';
 //import { currentUserUid } from './folders.js'; // exporte ela se ainda não estiver
 import { showMainView } from './app.js';

@@ -13,6 +13,10 @@ import {
 } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
 
 export async function createNote(userId, note) {
+  if (!userId) {
+    throw new Error("❌ userId está indefinido ao acessar o Firestore.");
+  }
+
   const notesRef = collection(db, 'users', userId, 'notes');
   const docRef = await addDoc(notesRef, {
     title: note.title,
@@ -28,6 +32,10 @@ export async function createNote(userId, note) {
  * Cria uma nova pasta no Firestore para o usuário.
  */
 export async function createFolder(userId, name) {
+  if (!userId) {
+    throw new Error("❌ userId está indefinido ao acessar o Firestore.");
+  }
+
   const foldersRef = collection(db, 'users', userId, 'folders');
   const docRef = await addDoc(foldersRef, {
     name: name,
@@ -40,6 +48,10 @@ export async function createFolder(userId, name) {
  * Busca todas as pastas do usuário no Firestore.
  */
 export async function getFolders(userId) {
+  if (!userId) {
+    throw new Error("❌ userId está indefinido ao acessar o Firestore.");
+  }
+
   const foldersRef = collection(db, 'users', userId, 'folders');
   const snapshot = await getDocs(foldersRef);
 
@@ -72,6 +84,10 @@ export async function updateFolder(userId, folderId, updates) {
 
 // Busca todas as notas de uma pasta
 export async function getNotes(userId, folderId = null) {
+  if (!userId) {
+    throw new Error("❌ userId está indefinido ao acessar o Firestore.");
+  }
+
   const notesRef = collection(db, 'users', userId, 'notes');
   let q = notesRef;
 
@@ -87,6 +103,10 @@ export async function getNotes(userId, folderId = null) {
 }
 
 export async function createWelcomeNoteIfNeeded(userId) {
+  if (!userId) {
+    throw new Error("❌ userId está indefinido ao acessar o Firestore.");
+  }
+
   const notesRef = collection(db, 'users', userId, 'notes');
 
   // Verifica se já existe uma nota de boas-vindas

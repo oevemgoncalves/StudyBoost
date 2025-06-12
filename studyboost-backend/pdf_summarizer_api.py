@@ -2,13 +2,13 @@ from weakref import ref
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware #para ajudar com o CORS
 from pydantic import BaseModel
+from dotenv import load_dotenv
 import requests
 import fitz  # PyMuPDF
 import os
 import uuid
 import google.generativeai as genai
 import traceback
-from dotenv import load_dotenv
 
 load_dotenv() #carrega as variáveis do .env
 
@@ -43,6 +43,8 @@ def extract_text_from_pdf(pdf_path):
 @app.post("/gerar-resumo")
 async def gerar_resumo(req: PDFRequest):
     try:
+        print("✅ Endpoint /gerar-resumo acionado")
+        print("🔗 URL recebida:", req.pdf_url)
         # 🔽 Baixa o PDF do Cloudinary (ou qualquer URL pública)
         response = requests.get(req.pdf_url)
         if response.status_code != 200:
@@ -56,8 +58,8 @@ async def gerar_resumo(req: PDFRequest):
         # 📄 Extrai o texto
         texto = extract_text_from_pdf(temp_filename)
 
-        print("🧪 Texto extraído do PDF (primeiros 500 caracteres):")
-        print(texto[:500]) 
+        # print("🧪 Texto extraído do PDF (primeiros 500 caracteres):")
+        # print(texto[:500]) 
 
         # 🧼 Remove o arquivo temporário
         os.remove(temp_filename)
@@ -69,10 +71,14 @@ async def gerar_resumo(req: PDFRequest):
         model = genai.GenerativeModel("models/gemini-2.0-flash")
         response = model.generate_content(f"Resuma o conteúdo abaixo de forma clara e organizada para estudo:\n\n{texto}")
 
-        resumo = response.text
+        resumo = response.candidates[0].content.parts[0].text
 
-        print("🧠 RESUMO FINAL A SER ENVIADO PARA O FRONT:")
-        print(resumo)
+
+        if not resumo:
+            raise HTTPException(status_code=500, detail="Resumo retornado pela IA está vazio.")
+        # print("🧠 RESUMO FINAL A SER ENVIADO PARA O FRONT:")
+        # print(resumo)
+        print("Tipo do retorno da IA:", type(response))
 
         return {"resumo": resumo}
 
@@ -82,10 +88,10 @@ async def gerar_resumo(req: PDFRequest):
         raise HTTPException(status_code=500, detail=f"Erro ao processar PDF: {str(e)}")
 
 
-url = "https://res.cloudinary.com/dyqp5onvs/raw/upload/v1749671411/jsrwmwnf78iymaa30o8b.pdf"
-res = requests.get(url)
-print(res.status_code)
-print(res.headers.get("Content-Type"))
+# url = "https://res.cloudinary.com/dyqp5onvs/raw/upload/v1749671411/jsrwmwnf78iymaa30o8b.pdf"
+# res = requests.get(url)
+# print(res.status_code)
+# print(res.headers.get("Content-Type"))
 
 
 
