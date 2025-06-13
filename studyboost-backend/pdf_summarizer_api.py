@@ -24,6 +24,9 @@ app.add_middleware(
     expose_headers=["*"]  # Adicione esta linha
 )
 
+@app.get("/")
+def read_root():
+    return {"msg": "API online!"}
 
 # 🔐 Substitua pela sua chave da API do Gemini (Google AI)
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
