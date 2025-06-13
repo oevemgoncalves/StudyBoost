@@ -82,8 +82,11 @@ function initModalPdf() {
     // Atualize também o fechamento do modal
     closeBtn.addEventListener('click', () => {
         resetFileInput();
-        if (pdfPreview.src) {
-            URL.revokeObjectURL(pdfPreview.src);
+        if (pdfPreview) {
+            if (pdfPreview.src) {
+                URL.revokeObjectURL(pdfPreview.src);
+            }
+            pdfPreview.src = '';
         }
         fileInput.value = '';
         pdfPreview.src = '';
