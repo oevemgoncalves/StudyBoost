@@ -141,6 +141,9 @@ function initModalPdf() {
             const pdfUrl = cloudinaryData.secure_url;
             console.log("📤 PDF enviado para Cloudinary:", pdfUrl);
 
+            resumoData = await resumoRes.json();
+            console.log("✅ Dados completos recebidos da IA:", resumoData);
+
             // 2. Chamada para o back-end com a URL do PDF
             const resumoRes = await fetch("https://studyboost-backend.onrender.com/gerar-resumo", {
                 method: "POST",
@@ -180,7 +183,9 @@ function initModalPdf() {
                 pdfUrl: pdfUrl,
                 createdAt: new Date(),
                 isPdf: true,
-                isWelcome: false
+                isWelcome: false,
+                quiz: resumoData.quiz || [],
+                flashcards: resumoData.flashcards || []
             };
 
             await createNote(currentUserUid, note);
