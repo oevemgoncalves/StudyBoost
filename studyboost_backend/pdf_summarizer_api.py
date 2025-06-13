@@ -1,4 +1,3 @@
-
 from weakref import ref
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware #para ajudar com o CORS
@@ -11,7 +10,6 @@ import re
 import uuid
 import google.generativeai as genai
 import traceback
-import json
 
 load_dotenv() #carrega as variáveis do .env
 
@@ -147,23 +145,7 @@ async def gerar_resumo(req: PDFRequest):
 
         resumo = html_formatado
 
-        # Gerar Quiz
-        quiz_prompt = f"Crie 21 perguntas de múltipla escolha com 4 alternativas cada, e a indicação da alternativa correta (0, 1, 2 ou 3), baseadas no seguinte texto. Formate como um array JSON de objetos: `[{{'pergunta': '', 'alternativas': ['', '', '', ''], 'correta': 0}}, ...]`\n\n{texto}"
-        quiz_response = model.generate_content(quiz_prompt)
-        quiz_data_raw = quiz_response.candidates[0].content.parts[0].text
-        quiz_data = json.loads(quiz_data_raw) # Parseia para JSON
-
-         # Gerar Flashcards
-        flashcards_prompt = f"Crie 16 flashcards (pergunta e resposta) baseados no seguinte texto. Formate como um array JSON de objetos: `[{{'pergunta': '', 'resposta': ''}}, ...]`\n\n{texto}"
-        flashcards_response = model.generate_content(flashcards_prompt)
-        flashcards_data_raw = flashcards_response.candidates[0].content.parts[0].text
-        flashcards_data = json.loads(flashcards_data_raw) # Parseia para JSON
-
-
-        return {"resumo": resumo,
-                "quiz": quiz_data,
-                "flashcards": flashcards_data
-                }
+        return {"resumo": resumo}
 
     except Exception as e:
         print("❌ ERRO COMPLETO:")
@@ -175,6 +157,3 @@ async def gerar_resumo(req: PDFRequest):
 # res = requests.get(url)
 # print(res.status_code)
 # print(res.headers.get("Content-Type"))
-
-
-

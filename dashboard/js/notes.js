@@ -7,7 +7,6 @@ import { activeFolderId, currentUserUid } from './folders.js';
 
 // elemento DOM
 let notesContainer;
-let currentOpenedNote = null; //variavel global
 
 function initNotes() {
     notesContainer = document.getElementById('notes-container');
@@ -181,8 +180,6 @@ async function openNote(noteId) {
             return;
         }
 
-        currentOpenedNote = note; //armazena a nota aberta
-
         const resumoContainer = document.querySelector('#notas .container__nota__resumo');
         if (resumoContainer) {
             resumoContainer.innerHTML = `
@@ -284,9 +281,5 @@ function showNoteView(noteId) {
 document.getElementById('currentFolder').addEventListener('click', () => {
     showMainView();
 });
-
-export function getCurrentOpenedNote() {    
-    return currentOpenedNote;
-}
 
 export { initNotes, renderNotes, showNoteView };

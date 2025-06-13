@@ -27,8 +27,8 @@ async function initApp() {
     initNotes();
     initChatBot();
     initModalPdf();
-    initFlashcards();
     initCards();
+    initFlashcards();
     initProfile();
 
     // Render initial state

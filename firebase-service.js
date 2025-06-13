@@ -23,9 +23,7 @@ export async function createNote(userId, note) {
     content: note.content,
     folderId: note.folderId,
     createdAt: new Date(),
-    isWelcome: note.isWelcome || false,
-    quiz: note.quiz || [],
-    flashcards: note.flashcards || []// Se não houver, salve como array vazio
+    isWelcome: note.isWelcome || false
   });
   return { id: docRef.id, ...note, createdAt: new Date() };
 }
@@ -156,9 +154,7 @@ export async function createWelcomeNoteIfNeeded(userId) {
         <p>Se você quer otimizar seus estudos e ter tudo em um só lugar, o <strong>StudyBoost</strong> é sua melhor escolha. Aproveite o poder da IA para turbinar seu aprendizado!</p>`,
       folderId: 'all',
       createdAt: new Date(),
-      isWelcome: true,
-      quiz: [],
-      flashcards: []
+      isWelcome: true
     });
     console.log("✅ Nota de boas-vindas criada.");
   } else {
