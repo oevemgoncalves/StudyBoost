@@ -76,12 +76,71 @@
 .container__nota__resumo ul {
     margin-left: 20px;
     color: var(--cor-black);
+    margin-bottom: 20px;
 }
 
 .container__nota__resumo ul > li {
+    margin-bottom: 8px;
+    font-size: 16px;
     line-height: 1.5em;
 }
 
+/*tabelas*/
+.container__nota__resumo table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 16px;
+  margin-bottom: 24px;
+  background-color: #fdfdfd;
+  box-shadow: 0 0 5px rgba(0,0,0,0.05);
+}
+
+.container__nota__resumo th,
+.container__nota__resumo td {
+  border: 1px solid #ddd;
+  padding: 12px 16px;
+  text-align: left;
+}
+
+.container__nota__resumo th {
+  background-color: #f0f0f0;
+  font-weight: 600;
+}
+
+.container__nota__resumo tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+/* Responsividade para tabela */
+@media screen and (max-width: 768px) {
+  .container__nota__resumo table,
+  .container__nota__resumo thead,
+  .container__nota__resumo tbody,
+  .container__nota__resumo th,
+  .container__nota__resumo td,
+  .container__nota__resumo tr {
+    display: block;
+    width: 100%;
+  }
+
+  .container__nota__resumo tr {
+    margin-bottom: 15px;
+  }
+
+  .container__nota__resumo td {
+    position: relative;
+    padding-left: 50%;
+  }
+
+  .container__nota__resumo td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 16px;
+    top: 12px;
+    font-weight: bold;
+    white-space: nowrap;
+  }
+}
 
 .hidden {
     display: none;
@@ -121,6 +180,7 @@
     transition: transform 0.5s ease-in-out, opacity 0.4s ease;
     transform-style: preserve-3d;
 }
+
 /*efeito de queda ao trocar cartao*/
 .card-inner.falling {
   transform: translateY(-40px);

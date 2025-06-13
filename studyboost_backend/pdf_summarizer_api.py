@@ -77,22 +77,73 @@ async def gerar_resumo(req: PDFRequest):
 
         texto_bruto = response.candidates[0].content.parts[0].text
 
-        # Divide o texto em linhas
-        linhas = texto_bruto.split('\n')
+        # Limpeza básica do Markdown: remove **, *, ##, #
+        texto_limpo = re.sub(r'[*#]{1,3}', '', texto_bruto).strip()
 
-        # Formata cada linha como parágrafo ou título (simples heurística)
+        linhas = texto_limpo.split('\n')
+
         html_formatado = ""
+        em_lista = False
+        em_tabela = False
+        tabela_temp = []
+
         for linha in linhas:
             linha = linha.strip()
             if not linha:
-                continue  # pula linhas vazias
-            if re.match(r'^\d+[\.\)]|^[-*•]', linha) or linha.isupper():
-                # Lista ou título -> <h2>
+                continue
+
+            # Detecta título (linha curta e sem pontuação final)
+            if len(linha) <= 80 and not linha.endswith('.'):
+                if em_lista:
+                    html_formatado += "</ul>\n"
+                    em_lista = False
+                if em_tabela:
+                    html_formatado += gerar_tabela_html(tabela_temp)
+                    tabela_temp = []
+                    em_tabela = False
                 html_formatado += f"<h2>{linha}</h2>\n"
+
+            # Detecta lista
+            elif re.match(r'^[-•]', linha):
+                if not em_lista:
+                    html_formatado += "<ul>\n"
+                    em_lista = True
+                item = re.sub(r'^[-•]\s*', '', linha)
+                html_formatado += f"<li>{item}</li>\n"
+
+            # Detecta linha tabular com "dimensão: valor" ou estrutura de dados
+            elif re.match(r'^[A-ZÁÉÍÓÚÃÕÇa-záéíóúâêîôûãõç0-9\s\-()]+:\s', linha):
+                em_tabela = True
+                tabela_temp.append(linha)
+
             else:
+                if em_lista:
+                    html_formatado += "</ul>\n"
+                    em_lista = False
+                if em_tabela:
+                    html_formatado += gerar_tabela_html(tabela_temp)
+                    tabela_temp = []
+                    em_tabela = False
                 html_formatado += f"<p>{linha}</p>\n"
 
+        # Fecha blocos abertos
+        if em_lista:
+            html_formatado += "</ul>\n"
+        if em_tabela:
+            html_formatado += gerar_tabela_html(tabela_temp)
+
         resumo = html_formatado
+
+        def gerar_tabela_html(linhas):
+            tabela_html = '<table border="1" cellpadding="6" cellspacing="0" style="border-collapse: collapse; width: 100%;">\n<thead><tr><th>Categoria</th><th>Descrição</th></tr></thead><tbody>\n'
+            for linha in linhas:
+                partes = linha.split(':', 1)
+                if len(partes) == 2:
+                    chave = partes[0].strip()
+                    valor = partes[1].strip()
+                    tabela_html += f"<tr><td><strong>{chave}</strong></td><td>{valor}</td></tr>\n"
+            tabela_html += "</tbody></table>\n"
+            return tabela_html
 
         return {"resumo": resumo}
 
