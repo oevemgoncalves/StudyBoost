@@ -17,7 +17,7 @@ app = FastAPI()
 # 🔼 Configure CORS aqui
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://127.0.0.1:5502", "https://study-boost-smoky.vercel.app/"],  # Ou ["*"] para permitir todos (apenas desenvolvimento)
+    allow_origins=["http://127.0.0.1:5502", "https://study-boost-smoky.vercel.app"],  # Ou ["*"] para permitir todos (apenas desenvolvimento)
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
