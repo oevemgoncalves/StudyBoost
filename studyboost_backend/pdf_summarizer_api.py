@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 import requests
 import fitz  # PyMuPDF
 import os
+import re
 import uuid
 import google.generativeai as genai
 import traceback
@@ -74,14 +75,24 @@ async def gerar_resumo(req: PDFRequest):
         model = genai.GenerativeModel("models/gemini-2.0-flash")
         response = model.generate_content(f"Resuma o conteúdo abaixo de forma clara e organizada para estudo:\n\n{texto}")
 
-        resumo = response.candidates[0].content.parts[0].text
+        texto_bruto = response.candidates[0].content.parts[0].text
 
+        # Divide o texto em linhas
+        linhas = texto_bruto.split('\n')
 
-        if not resumo:
-            raise HTTPException(status_code=500, detail="Resumo retornado pela IA está vazio.")
-        # print("🧠 RESUMO FINAL A SER ENVIADO PARA O FRONT:")
-        # print(resumo)
-        print("Tipo do retorno da IA:", type(response))
+        # Formata cada linha como parágrafo ou título (simples heurística)
+        html_formatado = ""
+        for linha in linhas:
+            linha = linha.strip()
+            if not linha:
+                continue  # pula linhas vazias
+            if re.match(r'^\d+[\.\)]|^[-*•]', linha) or linha.isupper():
+                # Lista ou título -> <h2>
+                html_formatado += f"<h2>{linha}</h2>\n"
+            else:
+                html_formatado += f"<p>{linha}</p>\n"
+
+        resumo = html_formatado
 
         return {"resumo": resumo}
 

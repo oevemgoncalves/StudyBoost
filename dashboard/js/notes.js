@@ -90,12 +90,12 @@ function createNoteElement(note) {
     content.className = 'note-content';
 
      // Mostra o início do resumo para notas PDF
-    content.textContent = note.content.slice(0, 200) + (note.content.length > 200 ? '...' : '');
+    content.className = 'note-content';
 
     if (note.isWelcome) {
         content.textContent = 'Transforme PDFs em resumos, flashcards, quizzes e Aúdios com IA.';
     } else {
-        content.textContent = note.content.slice(0, 200); // mostra só um pedaço
+        content.innerHTML = note.content; // Exibe todo o conteúdo do resumo, com formatação HTML
     }
 
     const footer = document.createElement('div');
