@@ -25,6 +25,17 @@ app.add_middleware(
     #expose_headers=["*"]  # Adicione esta linha
 )
 
+def gerar_tabela_html(linhas):
+            tabela_html = '<table border="1" cellpadding="6" cellspacing="0" style="border-collapse: collapse; width: 100%;">\n<thead><tr><th>Categoria</th><th>Descrição</th></tr></thead><tbody>\n'
+            for linha in linhas:
+                partes = linha.split(':', 1)
+                if len(partes) == 2:
+                    chave = partes[0].strip()
+                    valor = partes[1].strip()
+                    tabela_html += f"<tr><td><strong>{chave}</strong></td><td>{valor}</td></tr>\n"
+            tabela_html += "</tbody></table>\n"
+            return tabela_html
+
 @app.get("/")
 def read_root():
     return {"msg": "API online!"}
@@ -133,17 +144,6 @@ async def gerar_resumo(req: PDFRequest):
             html_formatado += gerar_tabela_html(tabela_temp)
 
         resumo = html_formatado
-
-        def gerar_tabela_html(linhas):
-            tabela_html = '<table border="1" cellpadding="6" cellspacing="0" style="border-collapse: collapse; width: 100%;">\n<thead><tr><th>Categoria</th><th>Descrição</th></tr></thead><tbody>\n'
-            for linha in linhas:
-                partes = linha.split(':', 1)
-                if len(partes) == 2:
-                    chave = partes[0].strip()
-                    valor = partes[1].strip()
-                    tabela_html += f"<tr><td><strong>{chave}</strong></td><td>{valor}</td></tr>\n"
-            tabela_html += "</tbody></table>\n"
-            return tabela_html
 
         return {"resumo": resumo}
 
