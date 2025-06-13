@@ -139,9 +139,9 @@ function initModalPdf() {
             console.log("📤 PDF enviado para Cloudinary:", pdfUrl);
 
             // 2. Chamada para o back-end com a URL do PDF
-            const resumoRes = await fetch("http://127.0.0.1:8000/gerar-resumo", {
+            const resumoRes = await fetch("http://studyboost-backend.onrender.com/gerar-resumo", {
                 method: "POST",
-                mode: "cors",
+                //mode: "cors",
                 headers: {
                     "Content-Type": "application/json",
                     "Accept": "application/json"
