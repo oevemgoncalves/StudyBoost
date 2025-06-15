@@ -51,8 +51,11 @@ const flashcards = [
 
 let current = 0;
 let flipped = false;
-
 let card, content, hint, counter, prev, next;
+
+function getActiveQuiz() {
+    return window.customQuiz && window.customQuiz.length > 0 ? window.customQuiz : quiz;
+}
 
 function renderCard() {
   flipped = false;
@@ -101,7 +104,8 @@ function flipCard() {
 }
 
 function nextCard() {
-  if (current < flashcards.length - 1) {
+  const activeFlashcards = window.customFlashcards && window.customFlashcards.length > 0 ? window.customFlashcards : flashcards;
+  if (current < activeFlashcards.length - 1) {
     current++;
     renderCard();
   }
@@ -113,6 +117,10 @@ function prevCard() {
     renderCard();
   }
 }
+
+window.nextCard = nextCard;
+window.prevCard = prevCard;
+
 
 // 👇 Esta função inicia o módulo corretamente
 function initFlashcards() {
@@ -164,12 +172,13 @@ let currentQuiz = 0;
 let embaralhado = false;
 
 function renderQuestion() {
-  const activeQuiz = window.customQuiz && window.customQuiz.length > 0 ? window.customQuiz : quiz;
+  const activeQuiz = getActiveQuiz();
   const q = activeQuiz[currentQuiz];
   const questionEl = document.getElementById('question');
   const optionsEl = document.getElementById('options');
   const nextBtn = document.getElementById('nextBtn');
   const counter = document.getElementById('counter');
+  const progressBar = document.getElementById('progress');
 
   questionEl.textContent = `Questão ${currentQuiz + 1}: ${q.pergunta}`;
   optionsEl.innerHTML = "";
@@ -187,17 +196,18 @@ function renderQuestion() {
       }
       document.querySelectorAll('.options button').forEach(b => b.disabled = true);
       nextBtn.style.display = "inline-block";
-    }
+    };
     optionsEl.appendChild(btn);
   });
 
   counter.textContent = `Questão ${currentQuiz + 1} de ${activeQuiz.length}`;
-  document.getElementById('progress').style.width = `${(currentQuiz + 1) / activeQuiz.length * 100}%`;
-
+  const progressoPercentual = ((currentQuiz + 1) / activeQuiz.length) * 100;
+  progressBar.style.width = `${progressoPercentual}%`;
 }
 
+
 function nextQuestion() {
-  if (currentQuiz < activeQuiz.length - 1) {
+  if (currentQuiz < getActiveQuiz().length - 1) {
     currentQuiz++;
     renderQuestion();
   }
@@ -209,11 +219,11 @@ function resetQuiz() {
 }
 
 function shuffleQuestions() {
-  for (let i = quiz.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [quiz[i], quiz[j]] = [quiz[j], quiz[i]];
+  const activeQuiz = getActiveQuiz();
+  for (let i = activeQuiz.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [activeQuiz[i], activeQuiz[j]] = [activeQuiz[j], activeQuiz[i]];
   }
-  resetQuiz();
 }
 
 export { initCards, initFlashcards, renderQuestion, nextQuestion, resetQuiz, shuffleQuestions };
