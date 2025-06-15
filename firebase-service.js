@@ -23,8 +23,12 @@ export async function createNote(userId, note) {
     content: note.content,
     folderId: note.folderId,
     createdAt: new Date(),
-    isWelcome: note.isWelcome || false
-  });
+    isWelcome: note.isWelcome || false,
+    pdfUrl: note.pdfUrl || null,
+    flashcards: note.flashcards || [],
+    quiz: note.quiz || []
+});
+
   return { id: docRef.id, ...note, createdAt: new Date() };
 }
 

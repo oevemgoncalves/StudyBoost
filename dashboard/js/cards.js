@@ -70,14 +70,27 @@ function renderCard() {
 
   cardEl.classList.remove("flipped");
 
-  document.getElementById("card-content").textContent = flashcards[current].pergunta;
-  document.getElementById("card-back").textContent = flashcards[current].resposta;
-  hint.textContent = "🖐️ Pressione para virar";
+  const activeFlashcards = window.customFlashcards && window.customFlashcards.length > 0 ? window.customFlashcards : flashcards;
+
+  document.getElementById("card-content").textContent = activeFlashcards[current].pergunta;
+  document.getElementById("card-back").textContent = activeFlashcards[current].resposta;
 
   prev.style.visibility = current === 0 ? "hidden" : "visible";
-  next.style.visibility = current === flashcards.length - 1 ? "hidden" : "visible";
+  next.style.visibility = current === activeFlashcards.length - 1 ? "hidden" : "visible";
+
 }
 
+export function updateFlashcardsUI() {
+    current = 0;
+    flipped = false;
+    renderCard();
+}
+
+export function updateQuizUI() {
+    currentQuiz = 0;
+    embaralhado = false;
+    renderQuestion();
+}
 
 
 function flipCard() {
@@ -151,7 +164,8 @@ let currentQuiz = 0;
 let embaralhado = false;
 
 function renderQuestion() {
-  const q = quiz[currentQuiz];
+  const activeQuiz = window.customQuiz && window.customQuiz.length > 0 ? window.customQuiz : quiz;
+  const q = activeQuiz[currentQuiz];
   const questionEl = document.getElementById('question');
   const optionsEl = document.getElementById('options');
   const nextBtn = document.getElementById('nextBtn');
@@ -177,12 +191,13 @@ function renderQuestion() {
     optionsEl.appendChild(btn);
   });
 
-  counter.textContent = `Questão ${currentQuiz + 1} de ${quiz.length}`;
-  document.getElementById('progress').style.width = `${(currentQuiz + 1) / quiz.length * 100}%`;
+  counter.textContent = `Questão ${currentQuiz + 1} de ${activeQuiz.length}`;
+  document.getElementById('progress').style.width = `${(currentQuiz + 1) / activeQuiz.length * 100}%`;
+
 }
 
 function nextQuestion() {
-  if (currentQuiz < quiz.length - 1) {
+  if (currentQuiz < activeQuiz.length - 1) {
     currentQuiz++;
     renderQuestion();
   }

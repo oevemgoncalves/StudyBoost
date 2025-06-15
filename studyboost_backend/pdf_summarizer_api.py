@@ -151,6 +151,63 @@ async def gerar_resumo(req: PDFRequest):
         print("❌ ERRO COMPLETO:")
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Erro ao processar PDF: {str(e)}")
+    
+class ResumoRequest(BaseModel):
+    resumo: str
+
+@app.post("/gerar-flashcards-e-quiz")
+async def gerar_flashcards_e_quiz(req: ResumoRequest):
+    try:
+        print("✅ Endpoint /gerar-flashcards-e-quiz acionado")
+
+        prompt = f"""
+        A partir do resumo abaixo, gere:
+
+        1️⃣ Uma lista com no máximo 16 flashcards no seguinte formato JSON:
+        [
+        {{ "pergunta": "Pergunta", "resposta": "Resposta" }},
+        ...
+        ]
+
+        2️⃣ Em seguida, uma lista com no máximo 21 perguntas de quiz no seguinte formato JSON:
+        [
+        {{
+            "pergunta": "Pergunta",
+            "alternativas": ["Opção A", "Opção B", "Opção C", "Opção D"],
+            "correta": 0
+        }},
+        ...
+        ]
+
+        ⚠️ IMPORTANTE:
+        - Responda apenas com o JSON no seguinte formato final:
+        {{ "flashcards": [...], "quiz": [...] }}
+        - Não inclua explicações ou textos extras.
+
+        RESUMO:
+        {req.resumo}
+        """
+
+        model = genai.GenerativeModel("models/gemini-2.0-flash")  # Ou o modelo que você quiser
+        response = model.generate_content(prompt)
+
+        raw_text = response.candidates[0].content.parts[0].text
+
+        # Tenta localizar o JSON puro
+        json_start = raw_text.find('{')
+        json_end = raw_text.rfind('}') + 1
+        json_str = raw_text[json_start:json_end]
+
+        import json
+        resultado = json.loads(json_str)
+
+        return resultado
+
+    except Exception as e:
+        print("❌ ERRO ao gerar flashcards e quiz:")
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Erro ao gerar flashcards e quiz: {str(e)}")
+
 
 
 # url = "https://res.cloudinary.com/dyqp5onvs/raw/upload/v1749671411/jsrwmwnf78iymaa30o8b.pdf"

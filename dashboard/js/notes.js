@@ -4,6 +4,7 @@ import { getNotes, createNote, getNoteById, deleteNote as deleteNoteFirebase } f
 //import { currentUserUid } from './folders.js'; // exporte ela se ainda não estiver
 import { showMainView } from './app.js';
 import { activeFolderId, currentUserUid } from './folders.js';
+import { updateFlashcardsUI, updateQuizUI } from './cards.js'; // Importa as novas funções que vamos criar
 
 // elemento DOM
 let notesContainer;
@@ -198,10 +199,25 @@ async function openNote(noteId) {
 
         document.querySelectorAll(".btn").forEach(btn => btn.classList.remove("notaActive"));
         document.querySelector('.btn[data-target="notas"]')?.classList.add("notaActive");
-    } catch (error) {
+
+        if (!note.isWelcome) {
+            window.customFlashcards = note.flashcards || [];
+            window.customQuiz = note.quiz || [];
+            console.log("📝 Flashcards personalizados carregados:", window.customFlashcards);
+            console.log("📝 Quiz personalizado carregado:", window.customQuiz);
+        } else {
+            window.customFlashcards = null;
+            window.customQuiz = null;
+        }
+
+        } catch (error) {
         console.error('Erro ao abrir nota:', error);
         alert("Erro ao carregar a nota");
     }
+
+    updateFlashcardsUI();
+    updateQuizUI();
+
 }
 
 async function createNewNote() {

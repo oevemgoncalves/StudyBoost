@@ -172,7 +172,35 @@ function initModalPdf() {
 
             console.log("Resumo recebido da IA:", resumoData);
 
-            // 3. Criar nota no Firebase
+            // Agora... Vamos gerar Flashcards e Quiz com base no resumo
+            let flashcards = [];
+            let quiz = [];
+
+            try {
+                const flashQuizRes = await fetch("https://studyboost-backend.onrender.com/gerar-flashcards-e-quiz", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ resumo: resumoData.resumo })
+                });
+
+                if (!flashQuizRes.ok) {
+                    throw new Error(`Erro HTTP ao gerar Flashcards e Quiz: ${flashQuizRes.status}`);
+                }
+
+                const flashQuizData = await flashQuizRes.json();
+                console.log("✅ Flashcards e Quiz gerados:", flashQuizData);
+
+                flashcards = flashQuizData.flashcards;
+                quiz = flashQuizData.quiz;
+
+            } catch (error) {
+                console.error("❌ Erro ao gerar Flashcards e Quiz:", error);
+                alert("Falha ao gerar Flashcards e Quiz. A nota será salva apenas com o resumo.");
+            }
+
+            // Agora cria a nota no Firebase com flashcards e quiz inclusos
             const note = {
                 title: file.name.replace(/\.pdf$/i, ''),
                 content: resumoData.resumo,
@@ -180,14 +208,15 @@ function initModalPdf() {
                 pdfUrl: pdfUrl,
                 createdAt: new Date(),
                 isPdf: true,
-                isWelcome: false
+                isWelcome: false,
+                flashcards: flashcards,
+                quiz: quiz
             };
 
             await createNote(currentUserUid, note);
             closeBtn.click();
-            console.log("👤 UID do usuário atual:", currentUserUid);
-
             renderNotes();
+
 
         } catch (err) {
             console.error("❌ Erro ao processar PDF:", err);
