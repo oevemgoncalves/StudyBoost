@@ -15,9 +15,11 @@ function initCards() {
 
       // 🚨 Re-renderiza o conteúdo quando muda de aba
       if (target === "flashcards") {
-        renderCard(); // agora será chamado na hora certa
+        renderCard();
       } else if (target === "quiz") {
-        renderQuestion(); // agora será chamado na hora certa
+        renderQuestion();
+      } else if (target === "audio") {
+        gerarEAbrirAudio();
       }
     });
   });
@@ -226,4 +228,36 @@ function shuffleQuestions() {
   }
 }
 
-export { initCards, initFlashcards, renderQuestion, nextQuestion, resetQuiz, shuffleQuestions };
+async function gerarEAbrirAudio() {
+    const audioSection = document.getElementById('audio');
+    audioSection.innerHTML = '<p>Gerando áudio... ⏳</p>';
+
+    try {
+        const response = await fetch('https://studyboost-backend.onrender.com/gerar-audio', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ texto: window.currentOpenedNoteContent })
+        });
+
+        if (!response.ok) {
+            throw new Error(`Erro ao gerar áudio: ${response.status}`);
+        }
+
+        const audioBlob = await response.blob();
+        const audioUrl = URL.createObjectURL(audioBlob);
+
+        audioSection.innerHTML = `
+            <audio controls autoplay>
+                <source src="${audioUrl}" type="audio/mpeg">
+                Seu navegador não suporta áudio.
+            </audio>
+        `;
+    } catch (error) {
+        console.error("Erro ao gerar áudio:", error);
+        audioSection.innerHTML = '<p>❌ Falha ao gerar o áudio.</p>';
+    }
+}
+
+export { initCards, initFlashcards, renderQuestion, nextQuestion, resetQuiz, shuffleQuestions, gerarEAbrirAudio };

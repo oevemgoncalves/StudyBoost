@@ -3,6 +3,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware #para ajudar com o CORS
 from pydantic import BaseModel
 from dotenv import load_dotenv
+from gtts import gTTS
 import requests
 import fitz  # PyMuPDF
 import os
@@ -18,11 +19,11 @@ app = FastAPI()
 # 🔼 Configure CORS aqui
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://127.0.0.1:5502", "https://study-boost-smoky.vercel.app"],  # Ou ["*"] para permitir todos (apenas desenvolvimento)
+    allow_origins=["http://127.0.0.1:5502", "https://study-boost-smoky.vercel.app"], 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-    #expose_headers=["*"]  # Adicione esta linha
+   
 )
 
 def gerar_tabela_html(linhas):
@@ -40,7 +41,7 @@ def gerar_tabela_html(linhas):
 def read_root():
     return {"msg": "API online!"}
 
-# 🔐 Substitua pela sua chave da API do Gemini (Google AI)
+# 🔐 chave da API do Gemini (Google AI)
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
 # Modelo da requisição esperada
@@ -209,7 +210,24 @@ async def gerar_flashcards_e_quiz(req: ResumoRequest):
         raise HTTPException(status_code=500, detail=f"Erro ao gerar flashcards e quiz: {str(e)}")
 
 
+class AudioRequest(BaseModel):
+    texto: str
 
+@app.post("/gerar-audio")
+async def gerar_audio(req: AudioRequest):
+    try:
+        # Gera o áudio a partir do texto recebido
+        tts = gTTS(text=req.texto, lang='pt-br')
+        output_filename = "output.mp3"
+        tts.save(output_filename)
+
+        # Retorna o áudio como bytes (para download direto)
+        from fastapi.responses import FileResponse
+        return FileResponse(output_filename, media_type="audio/mpeg", filename="resumo.mp3")
+
+    except Exception as e:
+        print("❌ Erro ao gerar áudio:", e)
+        raise HTTPException(status_code=500, detail=f"Erro ao gerar áudio: {str(e)}")
 # url = "https://res.cloudinary.com/dyqp5onvs/raw/upload/v1749671411/jsrwmwnf78iymaa30o8b.pdf"
 # res = requests.get(url)
 # print(res.status_code)

@@ -209,6 +209,8 @@ async function openNote(noteId) {
             `;
         }
 
+        window.currentOpenedNoteContent = note.content;
+
         // Atualização segura da UI
         document.getElementById('noteContentContainer')?.classList.remove('hidden');
         document.querySelector('.nova-nota-section')?.classList.add('hidden');
