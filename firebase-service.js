@@ -179,3 +179,18 @@ export async function deleteNote(userId, noteId) {
   const noteRef = doc(db, 'users', userId, 'notes', noteId);
   await deleteDoc(noteRef);
 }
+
+// Adicione estas funções no firebase-service.js
+
+export async function deleteAllNotesInFolder(userId, folderId) {
+  const notes = await getNotes(userId, folderId);
+  const batch = writeBatch(db);
+  
+  notes.forEach(note => {
+    const noteRef = doc(db, 'users', userId, 'notes', note.id);
+    batch.delete(noteRef);
+  });
+  
+  await batch.commit();
+  return notes; // Retornamos as notas para possível limpeza no Cloudinary
+}

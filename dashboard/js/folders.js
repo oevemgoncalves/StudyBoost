@@ -1,18 +1,14 @@
 // gerenciamento de pastas
 import { auth } from '../../firebase-config.js';
 import {
-  createFolder as createFolderFirebase,
-  createWelcomeNoteIfNeeded,
-  getFolders,
-  deleteFolder,
-  updateFolder
+    createFolder as createFolderFirebase,
+    createWelcomeNoteIfNeeded,
+    getFolders,
+    deleteFolder,
+    updateFolder,
+    getNotes, // Adicione esta linha
+    deleteNote
 } from '../../firebase-service.js';
-
-import { db } from '../../firebase-config.js';
-import {
-  deleteDoc,
-  doc
-} from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
 
 import { renderCurrentView, showMainView } from './app.js';
 import { initModalPdf } from './modal-pdf.js';
@@ -40,20 +36,20 @@ async function initFolders() {
     folderContainer = document.getElementById('folder-container');
     btnCriarNovaPasta = document.getElementById('btnCriarNovaPasta');
     pastaFixa = document.getElementById('pasta-fixa');
-    
+
     // Configurando ouvintes de eventos
     btnCriarNovaPasta.addEventListener('click', openModal);
     document.getElementById('fecharModal').addEventListener('click', closeModal);
     criarPastaBtn.addEventListener('click', createFolder);
     pastaFixa.addEventListener('click', () => selectFolder('all'));
-    
+
     // quando precionar Enter ele vai entrar
     pastaInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
             createFolder();
         }
     });
-    
+
     // Fechar modal ao clicar fora
     window.addEventListener('click', (e) => {
         if (e.target === modal) {
@@ -89,8 +85,8 @@ async function initFolders() {
         auth.onAuthStateChanged(async (user) => {
             if (user) {
                 currentUserUid = user.uid;
-                console.log("Usuário autenticado:", currentUserUid); 
-        
+                console.log("Usuário autenticado:", currentUserUid);
+
                 await createWelcomeNoteIfNeeded(currentUserUid);
                 const pastas = await getFolders(currentUserUid);
 
@@ -98,9 +94,9 @@ async function initFolders() {
                 renderFolders(pastas);
                 showMainView();
 
-            // ✅ Agora é seguro iniciar o modal de upload
-            //initModalPdf();  
-            resolve();
+                // ✅ Agora é seguro iniciar o modal de upload
+                //initModalPdf();  
+                resolve();
             } else {
                 console.log("Usuário não autenticado");
                 resolve();
@@ -114,7 +110,7 @@ async function initFolders() {
 function openModal() {
     modal.classList.remove('hidden');
     document.body.classList.add('modal-open');
-    
+
     // Pequeno atraso para garantir que o modal esteja no DOM antes da animação
     setTimeout(() => {
         modal.classList.add('active');
@@ -125,7 +121,7 @@ function openModal() {
 function closeModal() {
     modal.classList.remove('active');
     document.body.classList.remove('modal-open');
-    
+
     // Atrasar a ocultação do modal até que a animação seja concluída
     setTimeout(() => {
         modal.classList.add('hidden');
@@ -176,7 +172,7 @@ function renderFolders(folders) {
         const folderEl = document.createElement('div');
         folderEl.className = 'folder';
         folderEl.setAttribute('data-id', folder.id);
-        
+
         const folderContent = document.createElement('div');
         folderContent.className = 'folder-content';
         folderContent.style.display = 'flex';
@@ -185,21 +181,21 @@ function renderFolders(folders) {
 
         const icon = document.createElement('i');
         icon.className = 'fa-regular fa-folder-closed';
-        
+
         const name = document.createElement('span');
         name.textContent = folder.name;
         name.style.flexGrow = '1';
-        
+
         const menu = document.createElement('div');
         menu.className = 'folder-menu';
-        
+
         const menuBtn = document.createElement('button');
         menuBtn.className = 'folder-menu-btn';
         menuBtn.innerHTML = '<i class="fa-solid fa-ellipsis-vertical"></i>';
-        
+
         const menuOptions = document.createElement('div');
         menuOptions.className = 'folder-menu-options';
-        
+
         const renameOption = document.createElement('div');
         renameOption.className = 'folder-menu-option';
         renameOption.innerHTML = '<i class="fa-regular fa-pen-to-square"></i> Renomear';
@@ -208,10 +204,11 @@ function renderFolders(folders) {
             openRenameModal(folder.id, folder.name);
             menuOptions.classList.remove('show');
         });
-        
+
         const deleteOption = document.createElement('div');
         deleteOption.className = 'folder-menu-option';
         deleteOption.innerHTML = '<i class="fa-regular fa-trash-can"></i> Excluir';
+        // Modifique a função de exclusão de pasta em folders.js
         deleteOption.addEventListener('click', async (e) => {
             e.stopPropagation();
             if (confirm(`Tem certeza que deseja excluir a pasta "${folder.name}" e todas as suas notas?`)) {
@@ -219,10 +216,17 @@ function renderFolders(folders) {
                     // Buscar todas as notas dessa pasta
                     const notes = await getNotes(currentUserUid, folder.id);
 
-                    // Excluir cada nota
+                    // Excluir cada nota e seus PDFs associados
                     for (const note of notes) {
-                        const noteRef = doc(db, 'users', currentUserUid, 'notes', note.id);
-                        await deleteDoc(noteRef);
+                        if (note.pdfUrl) {
+                            try {
+                                const publicId = extractPublicIdFromUrl(note.pdfUrl);
+                                await deletePdfFromCloudinary(publicId);
+                            } catch (error) {
+                                console.error("Erro ao excluir PDF do Cloudinary:", error);
+                            }
+                        }
+                        await deleteNote(currentUserUid, note.id);
                     }
 
                     // Excluir a pasta
@@ -235,41 +239,46 @@ function renderFolders(folders) {
                     // Se a pasta ativa era a que foi deletada, volta para "all"
                     if (activeFolderId === folder.id) {
                         activeFolderId = 'all';
+                        await renderCurrentView();
                     }
 
-                    showMainView(); // atualiza as notas também
+                    showMainView();
                 } catch (error) {
                     console.error("Erro ao excluir pasta e notas:", error);
                     alert("Erro ao excluir pasta.");
                 }
             }
-
             menuOptions.classList.remove('show');
         });
 
-        
+        // Função auxiliar para extrair public_id da URL do Cloudinary
+        function extractPublicIdFromUrl(url) {
+            const matches = url.match(/upload\/(?:v\d+\/)?([^\.]+)/);
+            return matches ? matches[1] : null;
+        }
+
         menuOptions.appendChild(renameOption);
         menuOptions.appendChild(deleteOption);
         menu.appendChild(menuBtn);
         menu.appendChild(menuOptions);
-        
+
         menuBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             menuOptions.classList.toggle('show');
         });
-        
+
         folderContent.appendChild(icon);
         folderContent.appendChild(name);
         folderEl.appendChild(folderContent);
         folderEl.appendChild(menu);
-        
+
         folderEl.addEventListener('click', () => {
             document.querySelectorAll('.folder-menu-options').forEach(opt => {
                 opt.classList.remove('show');
             });
             selectFolder(folder.id);
         });
-        
+
         folderContainer.appendChild(folderEl);
     });
 
@@ -336,16 +345,16 @@ function showConfirmMessage() {
 // No final de folders.js, adicione:
 async function getFolderNameById(folderId) {
     if (folderId === 'all') return 'Todas as Notas';
-    
+
     const folders = await getFolders(currentUserUid);
     const folder = folders.find(f => f.id === folderId);
     return folder ? folder.name : 'Pasta';
 }
 
 
-export { 
-  initFolders,
-  activeFolderId, 
-  currentUserUid, 
-  getFolderNameById 
+export {
+    initFolders,
+    activeFolderId,
+    currentUserUid,
+    getFolderNameById
 };

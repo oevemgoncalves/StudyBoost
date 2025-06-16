@@ -8,7 +8,7 @@ let modalPdfInitialized = false;
 function initModalPdf() {
     if (modalPdfInitialized) return;
     modalPdfInitialized = true;
-    
+
     const modalPDF = document.getElementById('container__principal__modal__pdf');
     const openBtn = document.getElementById('abrirUploadModalBtn');
     const closeBtn = document.getElementById('closeUploadModalBtn');
@@ -116,6 +116,7 @@ function initModalPdf() {
 
     // Quando o botão "Gerar Nota" for clicado
     gerarNotaBtn.addEventListener('click', async () => {
+        console.log("⚡ Cliquei no botão de upload")
         const file = fileInput.files[0];
         if (!file) {
             alert('Selecione um arquivo PDF primeiro.');

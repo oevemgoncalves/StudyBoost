@@ -1,6 +1,7 @@
 // Gerenciamento de notas
 //import { store } from './store.js';
-import { getNotes, createNote, getNoteById, deleteNote as deleteNoteFirebase } from '../../firebase-service.js';
+import { getNotes, createNote, getNoteById, deleteNote } from '../../firebase-service.js';
+import { deletePdfFromCloudinary } from '../../upload-service.js';
 //import { currentUserUid } from './folders.js'; // exporte ela se ainda não estiver
 import { showMainView } from './app.js';
 import { activeFolderId, currentUserUid } from './folders.js';
@@ -71,7 +72,7 @@ async function renderNotes() {
     if (notes.length === 0) {
         console.log("📭 Nenhuma nota encontrada.");
         notesContainer.innerHTML = "<p style='color: red;'>Nenhuma nota encontrada nessa pasta.</p>";
-    }   
+    }
 
 }
 
@@ -90,7 +91,7 @@ function createNoteElement(note) {
     const content = document.createElement('div');
     content.className = 'note-content';
 
-     // Mostra o início do resumo para notas PDF
+    // Mostra o início do resumo para notas PDF
     content.className = 'note-content';
 
     if (note.isWelcome) {
@@ -128,14 +129,33 @@ function createNoteElement(note) {
     deleteBtn.addEventListener('click', async (e) => {
         e.stopPropagation();
         if (confirm('Tem certeza que deseja excluir esta nota permanentemente?')) {
-            await store.deleteNote(note.id);
-            await renderNotes();
-            if (note.isPdf) {
-                // Se for um PDF, também excluir do Storage
-                await PdfService.deletePdf(note.pdfId, note.pdfPath);
+            try {
+                const fullNote = await getNoteById(currentUserUid, note.id);
+
+                if (fullNote.pdfUrl) {
+                    try {
+                        const publicId = extractPublicIdFromUrl(fullNote.pdfUrl);
+                        await deletePdfFromCloudinary(publicId);
+                    } catch (error) {
+                        console.error("Erro ao excluir PDF do Cloudinary:", error);
+                        // Não interrompe o fluxo mesmo se falhar a exclusão no Cloudinary
+                    }
+                }
+
+                await deleteNote(currentUserUid, note.id);
+                await renderNotes();
+            } catch (error) {
+                console.error("Erro ao excluir nota:", error);
+                alert("Erro ao excluir nota.");
             }
         }
     });
+
+    // Adicione a função auxiliar para extrair public_id
+    function extractPublicIdFromUrl(url) {
+        const matches = url.match(/upload\/(?:v\d+\/)?([^\.]+)/);
+        return matches ? matches[1] : null;
+    }
 
     // Adicione o botão às ações
     actions.appendChild(deleteBtn);
@@ -160,15 +180,15 @@ function createNoteElement(note) {
 
 function renderEmptyState() {
     if (!notesContainer) return;
-    
+
     notesContainer.innerHTML = '';
     const emptyEl = document.createElement('div');
     emptyEl.className = 'empty-notes';
-    
+
     const message = document.createElement('p');
     message.textContent = 'Nenhuma nota encontrada nesta pasta.';
     emptyEl.appendChild(message);
-    
+
     notesContainer.appendChild(emptyEl);
 }
 
@@ -210,7 +230,7 @@ async function openNote(noteId) {
             window.customQuiz = null;
         }
 
-        } catch (error) {
+    } catch (error) {
         console.error('Erro ao abrir nota:', error);
         alert("Erro ao carregar a nota");
     }
@@ -221,20 +241,20 @@ async function openNote(noteId) {
 }
 
 async function createNewNote() {
-  if (!activeFolderId || !currentUserUid) return;
+    if (!activeFolderId || !currentUserUid) return;
 
-  const newNote = {
-    title: 'Nova anotação',
-    content: 'Clique para editar esta anotação.',
-    folderId: activeFolderId
-  };
+    const newNote = {
+        title: 'Nova anotação',
+        content: 'Clique para editar esta anotação.',
+        folderId: activeFolderId
+    };
 
-  try {
-    const note = await createNote(currentUserUid, newNote);
-    //renderNotes(); // recarrega as notas na tela
-  } catch (err) {
-    console.error("Erro ao criar nova nota:", err);
-  }
+    try {
+        const note = await createNote(currentUserUid, newNote);
+        //renderNotes(); // recarrega as notas na tela
+    } catch (err) {
+        console.error("Erro ao criar nova nota:", err);
+    }
 }
 
 function formatDate(date) {
