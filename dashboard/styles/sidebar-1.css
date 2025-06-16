@@ -140,6 +140,24 @@ span.pasta {
     transform: translateY(-1px);
 }
 
+.sidebar-footer {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Estilo para o container do perfil na sidebar */
+.sidebar .profile-container {
+    order: 2;
+    margin-top: 10px;
+    background-color: var(--cor-terciaria);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+}
+
 @media screen  and (min-width: 769px) {
     .toggle-arrow{
         display: none;

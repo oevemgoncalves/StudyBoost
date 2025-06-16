@@ -33,6 +33,9 @@
     padding: 0 20px;
     overflow-x: hidden;
     margin-top: 10px;
+    display: flex;
+    flex-flow: row nowrap;
+    
 }
 
 /* modificação nos cards/resumo no geral*/
@@ -42,6 +45,7 @@
     width: 800px;
     margin: auto;
     margin-top: 30px;
+    margin-bottom: 10px;
     list-style-position: inside;
 }
 
@@ -79,7 +83,7 @@
     margin-bottom: 20px;
 }
 
-.container__nota__resumo ul > li {
+.container__nota__resumo ul>li {
     margin-bottom: 8px;
     font-size: 16px;
     line-height: 1.5em;
@@ -87,59 +91,28 @@
 
 /*tabelas*/
 .container__nota__resumo table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 16px;
-  margin-bottom: 24px;
-  background-color: #fdfdfd;
-  box-shadow: 0 0 5px rgba(0,0,0,0.05);
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+    margin-bottom: 24px;
+    background-color: #fdfdfd;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.05);
 }
 
 .container__nota__resumo th,
 .container__nota__resumo td {
-  border: 1px solid #ddd;
-  padding: 12px 16px;
-  text-align: left;
+    border: 1px solid #ddd;
+    padding: 12px 16px;
+    text-align: left;
 }
 
 .container__nota__resumo th {
-  background-color: #f0f0f0;
-  font-weight: 600;
+    background-color: #f0f0f0;
+    font-weight: 600;
 }
 
 .container__nota__resumo tr:nth-child(even) {
-  background-color: #f9f9f9;
-}
-
-/* Responsividade para tabela */
-@media screen and (max-width: 768px) {
-  .container__nota__resumo table,
-  .container__nota__resumo thead,
-  .container__nota__resumo tbody,
-  .container__nota__resumo th,
-  .container__nota__resumo td,
-  .container__nota__resumo tr {
-    display: block;
-    width: 100%;
-  }
-
-  .container__nota__resumo tr {
-    margin-bottom: 15px;
-  }
-
-  .container__nota__resumo td {
-    position: relative;
-    padding-left: 50%;
-  }
-
-  .container__nota__resumo td::before {
-    content: attr(data-label);
-    position: absolute;
-    left: 16px;
-    top: 12px;
-    font-weight: bold;
-    white-space: nowrap;
-  }
+    background-color: #f9f9f9;
 }
 
 .hidden {
@@ -153,7 +126,7 @@
     align-items: center;
     justify-content: center;
     margin-top: 20px;
-    
+
 }
 
 .flashcards__title {
@@ -161,6 +134,7 @@
     max-width: 700px;
     margin-bottom: 30px;
 }
+
 .card {
     min-width: 700px;
     height: 260px;
@@ -183,35 +157,38 @@
 
 /*efeito de queda ao trocar cartao*/
 .card-inner.falling {
-  transform: translateY(-40px);
-  opacity: 0;
+    transform: translateY(-40px);
+    opacity: 0;
 }
+
 .card.flipped .card-inner {
-  transform: rotateY(180deg);
+    transform: rotateY(180deg);
 }
 
 .card-front,
 .card-back {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  backface-visibility: hidden;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 1.2rem;
-  border: 1px solid #ccc;
-  border-radius: 15px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-  background-color: #f3f3f3;
-  text-align: center;
-  transform: rotateY(0deg); /* adiciona esta linha para a frente */
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2rem;
+    border: 1px solid #ccc;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    background-color: #f3f3f3;
+    text-align: center;
+    transform: rotateY(0deg);
+    /* adiciona esta linha para a frente */
 }
 
 .card-back {
-  transform: rotateY(180deg); /* ou rotateX(180deg) se estiver usando eixo X */
-  background: #e6ffe6;
+    transform: rotateY(180deg);
+    /* ou rotateX(180deg) se estiver usando eixo X */
+    background: #e6ffe6;
 }
 
 
@@ -220,6 +197,7 @@
     font-size: 0.9rem;
     color: #666;
 }
+
 .controls {
     display: flex;
     justify-content: space-between;
@@ -228,6 +206,7 @@
     margin: 20px 10px;
     gap: 10px;
 }
+
 .controls button {
     padding: 10px 20px;
     border: none;
@@ -237,9 +216,11 @@
     cursor: pointer;
     font-weight: bold;
 }
+
 .controls button:hover {
     background-color: #333;
 }
+
 .counter {
     font-size: 0.9rem;
     color: #333;
@@ -254,6 +235,7 @@
     justify-content: center;
     margin-top: 20px;
 }
+
 .quiz-header {
     display: flex;
     justify-content: space-between;
@@ -266,7 +248,7 @@
 .quiz-container {
     background: white;
     border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     padding: 2rem;
     width: 100%;
     max-width: 800px;
@@ -344,3 +326,83 @@
     font-size: 1rem;
 }
 
+/* Responsividade */
+@media screen and (max-width: 768px) {
+
+    .container__nota {
+        border: none;
+        padding: 0;
+        margin-top: 20px;
+    }
+    /*tabela*/
+    .container__nota__resumo table,
+    .container__nota__resumo thead,
+    .container__nota__resumo tbody,
+    .container__nota__resumo th,
+    .container__nota__resumo td,
+    .container__nota__resumo tr {
+        display: block;
+        width: 100%;
+    }
+
+    .container__nota__resumo {
+        width: 100%;
+    }
+
+    .container__nota__resumo h1 {
+        font-size: 2.6em;
+        line-height: normal;
+        text-align: center;
+    }
+
+    .container__nota__resumo tr {
+        margin-bottom: 15px;
+    }
+
+    .container__nota__resumo td {
+        position: relative;
+        padding-left: 50%;
+    }
+
+    .container__nota__resumo td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 16px;
+        top: 12px;
+        font-weight: bold;
+        white-space: nowrap;
+    }
+
+    /*quiz*/
+    .quiz-header {
+        /* margin-top: 40px; */
+    }
+
+    .card {
+        min-width: 90%;
+        height: 80vh;
+    }
+
+    .card-front,
+    .card-back {
+        font-size: 1rem;
+        padding: 15px;
+    }
+
+    .controls {
+        flex-direction: column;
+        width: 90%;
+        margin: 10px auto;
+    }
+
+    .controls button {
+        width: 100%;
+        padding: 10px;
+    }
+
+    .flashcards__title {
+        max-width: 90%;
+        text-align: center;
+    }
+    
+}

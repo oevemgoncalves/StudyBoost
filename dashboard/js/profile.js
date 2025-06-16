@@ -33,9 +33,12 @@ export function initProfile() {
     profileContainer.appendChild(settingsIcon);
     
     // Adiciona o perfil ao DOM (você pode ajustar o seletor conforme necessário)
-    const sidebar = document.querySelector('.sidebar');
-    sidebar.appendChild(profileContainer);
+    const sidebarFooter = document.createElement('div');
+    sidebarFooter.className = 'sidebar-footer';
+    sidebarFooter.appendChild(profileContainer);
     
+    const sidebar = document.querySelector('.sidebar');
+    sidebar.appendChild(sidebarFooter);
     // Cria o modal do perfil
     const profileModal = document.createElement('div');
     profileModal.className = 'profile-modal';
