@@ -4,7 +4,11 @@ import { activeFolderId, currentUserUid } from './folders.js';
 import { renderNotes } from './notes.js';
 //import { uploadPdfToCloudinary } from '../../upload-service.js';
 
+let modalPdfInitialized = false;
 function initModalPdf() {
+    if (modalPdfInitialized) return;
+    modalPdfInitialized = true;
+    
     const modalPDF = document.getElementById('container__principal__modal__pdf');
     const openBtn = document.getElementById('abrirUploadModalBtn');
     const closeBtn = document.getElementById('closeUploadModalBtn');

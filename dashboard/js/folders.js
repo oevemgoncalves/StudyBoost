@@ -99,7 +99,7 @@ async function initFolders() {
                 showMainView();
 
             // ✅ Agora é seguro iniciar o modal de upload
-            initModalPdf();  
+            //initModalPdf();  
             resolve();
             } else {
                 console.log("Usuário não autenticado");
