@@ -1,19 +1,22 @@
 .botoes {
-    background-color: #d9d9d9;
+    background-color: #e2e8f0;
     display: flex;
     justify-content: space-between;
     border-radius: 8px;
-    padding: 3px;
-    gap: 10px;
+    padding: 4px;
+    gap: 8px;
 }
 
 .btn {
-    color: var(--cor-black);
+    color: var(--cor-text-primary);
     background: none;
     border: none;
-    border-radius: 8px;
+    border-radius: 6px;
     padding: 10px;
-    width: 285px;
+    flex: 1;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .notaActive {
@@ -27,69 +30,76 @@
 }
 
 .container__nota {
-    height: 80vh;
-    border: 1px solid black;
-    border-radius: 8px;
-    padding: 0 20px;
+    min-height: 75vh;
+    max-height: 82vh;
+    border: 1px solid var(--cor-border);
+    background-color: var(--cor-terciaria);
+    box-shadow: var(--shadow-sm);
+    border-radius: 12px;
+    padding: 24px;
     overflow-x: hidden;
-    margin-top: 10px;
+    overflow-y: auto;
+    margin-top: 12px;
     display: flex;
-    flex-flow: row nowrap;
-    
+    flex-flow: column nowrap;
 }
 
 /* modificação nos cards/resumo no geral*/
 .container__nota__resumo {
     display: flex;
     flex-flow: column nowrap;
-    width: 800px;
-    margin: auto;
-    margin-top: 30px;
-    margin-bottom: 10px;
+    width: 100%;
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 10px 0 24px 0;
     list-style-position: inside;
 }
 
 .container__nota__resumo h1 {
-    font-family: var(--cor-primaria);
+    font-family: var(--font-principal);
     font-weight: 700;
-    color: var(--cor-black);
-    font-size: 60px;
-    line-height: 60px;
+    color: var(--cor-text-primary);
+    font-size: 2.25rem;
+    line-height: 1.25;
+    margin-bottom: 16px;
+    word-break: break-word;
 }
 
 .container__nota__resumo h2 {
-    font-size: 1.5em;
+    font-size: 1.4rem;
     font-weight: 600;
-    margin-top: 10px;
-    color: var(--cor-black);
+    margin-top: 20px;
+    margin-bottom: 8px;
+    color: var(--cor-text-primary);
 }
 
 .container__nota__resumo h3 {
-    margin-top: 10px;
-    color: var(--cor-black);
+    margin-top: 16px;
+    margin-bottom: 6px;
+    color: var(--cor-text-primary);
 }
 
 .container__nota__resumo p {
-    font-size: 1em;
-    line-height: 30px;
-    color: var(--cor-black);
+    font-size: 1rem;
+    line-height: 1.75;
+    color: var(--cor-text-primary);
     margin-top: 10px;
 }
 
-
 .container__nota__resumo ul {
     margin-left: 20px;
-    color: var(--cor-black);
-    margin-bottom: 20px;
+    margin-top: 8px;
+    color: var(--cor-text-primary);
+    margin-bottom: 16px;
 }
 
-.container__nota__resumo ul>li {
+.container__nota__resumo ul > li {
     margin-bottom: 8px;
-    font-size: 16px;
-    line-height: 1.5em;
+    font-size: 1rem;
+    line-height: 1.6;
 }
 
-/*tabelas*/
+/* tabelas */
 .container__nota__resumo table {
     width: 100%;
     border-collapse: collapse;
@@ -119,30 +129,30 @@
     display: none;
 }
 
-/*flashcards*/
+/* flashcards */
 .flashcards__container {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    margin-top: 20px;
-
+    margin-top: 12px;
 }
 
 .flashcards__title {
     text-align: left;
     max-width: 700px;
-    margin-bottom: 30px;
+    margin-bottom: 16px;
 }
 
 .card {
-    min-width: 700px;
-    height: 260px;
+    width: 100%;
+    max-width: 700px;
+    height: 280px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    margin: 20px auto;
+    margin: 16px auto;
     cursor: pointer;
     perspective: 1000px;
 }
@@ -151,13 +161,13 @@
     width: 100%;
     height: 100%;
     position: relative;
-    transition: transform 0.5s ease-in-out, opacity 0.4s ease;
+    transition: transform 0.5s ease-in-out, opacity 0.3s ease;
     transform-style: preserve-3d;
 }
 
-/*efeito de queda ao trocar cartao*/
+/* efeito de queda ao trocar cartao */
 .card-inner.falling {
-    transform: translateY(-40px);
+    transform: translateY(-25px);
     opacity: 0;
 }
 
@@ -175,65 +185,67 @@
     justify-content: center;
     align-items: center;
     font-size: 1.2rem;
-    border: 1px solid #ccc;
+    border: 1px solid #cbd5e1;
     border-radius: 15px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-    background-color: #f3f3f3;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    padding: 24px;
+    background-color: #f8fafc;
     text-align: center;
+    overflow-y: auto;
     transform: rotateY(0deg);
-    /* adiciona esta linha para a frente */
 }
 
 .card-back {
     transform: rotateY(180deg);
-    /* ou rotateX(180deg) se estiver usando eixo X */
-    background: #e6ffe6;
+    background: #ecfdf5;
+    border-color: #a7f3d0;
 }
 
-
 .hint {
-    margin-top: 10px;
+    margin-top: 8px;
     font-size: 0.9rem;
-    color: #666;
+    color: #64748b;
+    user-select: none;
 }
 
 .controls {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 700px;
-    margin: 20px 10px;
+    width: 100%;
+    max-width: 700px;
+    margin: 20px auto;
     gap: 10px;
 }
 
 .controls button {
     padding: 10px 20px;
     border: none;
-    border-radius: 6px;
-    background-color: #000;
+    border-radius: 8px;
+    background-color: var(--cor-primaria);
     color: white;
     cursor: pointer;
-    font-weight: bold;
+    font-weight: 600;
+    transition: background-color 0.2s ease;
 }
 
 .controls button:hover {
-    background-color: #333;
+    background-color: var(--cor-primaria-hover);
 }
 
 .counter {
-    font-size: 0.9rem;
-    color: #333;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #334155;
 }
 
-
-/*QUIZZES*/
+/* QUIZZES */
 .quiz__container {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    margin-top: 20px;
+    justify-content: flex-start;
+    margin-top: 12px;
 }
 
 .quiz-header {
@@ -242,13 +254,20 @@
     align-items: center;
     width: 100%;
     max-width: 800px;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
+}
+
+.control-btns {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
 }
 
 .quiz-container {
     background: white;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--cor-border);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
     padding: 2rem;
     width: 100%;
     max-width: 800px;
@@ -256,85 +275,115 @@
 
 .progress-bar {
     width: 100%;
-    height: 6px;
-    background: #eee;
-    border-radius: 3px;
+    height: 8px;
+    background: #e2e8f0;
+    border-radius: 4px;
     overflow: hidden;
-    margin-bottom: 1rem;
+    margin-bottom: 1.25rem;
 }
 
 .progress {
     height: 100%;
-    background-color: purple;
+    background-color: var(--cor-primaria);
     width: 0%;
+    transition: width 0.3s ease;
 }
 
 .question {
-    font-weight: bold;
+    font-weight: 600;
     font-size: 1.2rem;
-    margin-bottom: 1rem;
+    margin-bottom: 1.25rem;
+    color: var(--cor-text-primary);
 }
 
 .options button {
     display: block;
     width: 100%;
     padding: 1rem;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.6rem;
     border: 2px solid transparent;
     border-radius: 8px;
-    background-color: #f2f2f2;
+    background-color: #f1f5f9;
     font-size: 1rem;
     cursor: pointer;
     text-align: left;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.options button:hover:not(:disabled) {
+    background-color: #e2e8f0;
 }
 
 .options button.correct {
-    border-color: green;
-    background-color: #e0ffe0;
+    border-color: #16a34a;
+    background-color: #dcfce7;
+    color: #14532d;
+    font-weight: 500;
 }
 
 .options button.incorrect {
-    border-color: red;
-    background-color: #ffe0e0;
+    border-color: #dc2626;
+    background-color: #fee2e2;
+    color: #7f1d1d;
 }
 
 .next-btn {
     display: none;
     padding: 0.75rem 1.5rem;
-    background-color: black;
+    background-color: var(--cor-primaria);
     color: white;
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    font-weight: bold;
+    font-weight: 600;
     float: right;
     margin-top: 1rem;
+    transition: background-color 0.2s ease;
+}
+
+.next-btn:hover {
+    background-color: var(--cor-primaria-hover);
 }
 
 .question-counter {
-    margin-top: 1rem;
+    margin-top: 1.25rem;
     font-size: 0.9rem;
-    color: #555;
+    color: #64748b;
 }
 
 .control-btns button {
-    background: none;
-    border: none;
+    background: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    padding: 6px 12px;
+    border-radius: 6px;
     cursor: pointer;
-    font-weight: bold;
-    color: #333;
-    font-size: 1rem;
+    font-weight: 600;
+    color: #334155;
+    font-size: 0.9rem;
+    transition: background-color 0.2s ease;
+}
+
+.control-btns button:hover {
+    background: #e2e8f0;
 }
 
 /* Responsividade */
 @media screen and (max-width: 768px) {
+    .botoes {
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        min-width: calc(50% - 8px);
+    }
 
     .container__nota {
-        border: none;
-        padding: 0;
-        margin-top: 20px;
+        padding: 16px;
+        margin-top: 16px;
+        max-height: none;
     }
-    /*tabela*/
+
+    /* tabela */
     .container__nota__resumo table,
     .container__nota__resumo thead,
     .container__nota__resumo tbody,
@@ -350,8 +399,8 @@
     }
 
     .container__nota__resumo h1 {
-        font-size: 2.6em;
-        line-height: normal;
+        font-size: 1.75rem;
+        line-height: 1.3;
         text-align: center;
     }
 
@@ -361,48 +410,36 @@
 
     .container__nota__resumo td {
         position: relative;
-        padding-left: 50%;
-    }
-
-    .container__nota__resumo td::before {
-        content: attr(data-label);
-        position: absolute;
-        left: 16px;
-        top: 12px;
-        font-weight: bold;
-        white-space: nowrap;
-    }
-
-    /*quiz*/
-    .quiz-header {
-        /* margin-top: 40px; */
+        padding-left: 16px;
     }
 
     .card {
-        min-width: 90%;
-        height: 80vh;
+        width: 100%;
+        height: 260px;
     }
 
     .card-front,
     .card-back {
         font-size: 1rem;
-        padding: 15px;
+        padding: 16px;
     }
 
     .controls {
-        flex-direction: column;
-        width: 90%;
-        margin: 10px auto;
+        flex-direction: row;
+        width: 100%;
+        margin: 12px auto;
     }
 
     .controls button {
-        width: 100%;
-        padding: 10px;
+        padding: 10px 14px;
     }
 
     .flashcards__title {
-        max-width: 90%;
+        max-width: 100%;
         text-align: center;
     }
-    
+
+    .quiz-container {
+        padding: 1.25rem;
+    }
 }

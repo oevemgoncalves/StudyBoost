@@ -1,14 +1,29 @@
 // Gerenciamento de notas
-//import { store } from './store.js';
-import { getNotes, createNote, getNoteById, deleteNote } from '../../firebase-service.js';
+import { getNotes, createNote, getNoteById, deleteNote, updateNote, getFolders } from '../../firebase-service.js';
 import { deletePdfFromCloudinary } from '../../upload-service.js';
-//import { currentUserUid } from './folders.js'; // exporte ela se ainda não estiver
 import { showMainView } from './app.js';
 import { activeFolderId, currentUserUid } from './folders.js';
-import { updateFlashcardsUI, updateQuizUI } from './cards.js'; // Importa as novas funções que vamos criar
+import { updateFlashcardsUI, updateQuizUI } from './cards.js';
 
 // elemento DOM
 let notesContainer;
+let moveFolderModal = null;
+let noteIdToMove = null;
+
+// Função auxiliar para extrair public_id do Cloudinary
+function extractPublicIdFromUrl(url) {
+    if (!url) return null;
+    const matches = url.match(/upload\/(?:v\d+\/)?([^\.]+)/);
+    return matches ? matches[1] : null;
+}
+
+// Função auxiliar para converter HTML em texto limpo para cópia
+function htmlToPlainText(html) {
+    if (!html) return '';
+    const temp = document.createElement('div');
+    temp.innerHTML = html;
+    return (temp.innerText || temp.textContent || '').trim();
+}
 
 function initNotes() {
     notesContainer = document.getElementById('notes-container');
@@ -16,64 +31,129 @@ function initNotes() {
         console.error('Elemento notes-container não encontrado no DOM');
         return false;
     }
+
+    const currentFolderBtn = document.getElementById('currentFolder');
+    if (currentFolderBtn && !currentFolderBtn.dataset.listenerAttached) {
+        currentFolderBtn.dataset.listenerAttached = 'true';
+        currentFolderBtn.addEventListener('click', () => {
+            showMainView();
+        });
+    }
+
+    ensureMoveFolderModal();
     return true;
+}
+
+function ensureMoveFolderModal() {
+    if (moveFolderModal) return;
+
+    moveFolderModal = document.createElement('div');
+    moveFolderModal.className = 'rename-modal';
+    moveFolderModal.innerHTML = `
+        <div class="rename-modal-content" style="height: auto; min-height: 190px;">
+            <h2 style="margin-bottom: 12px;">Mover para pasta</h2>
+            <select id="moveFolderSelect" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 16px; font-size: 0.95rem;">
+                <option value="all">Todas as Notas</option>
+            </select>
+            <div class="rename-modal-actions">
+                <button id="cancelMoveFolderBtn" type="button" style="background: #64748b;">Cancelar</button>
+                <button id="confirmMoveFolderBtn" type="button">Salvar</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(moveFolderModal);
+
+    moveFolderModal.querySelector('#cancelMoveFolderBtn').addEventListener('click', () => {
+        moveFolderModal.classList.remove('active');
+        noteIdToMove = null;
+    });
+
+    moveFolderModal.addEventListener('click', (e) => {
+        if (e.target === moveFolderModal) {
+            moveFolderModal.classList.remove('active');
+            noteIdToMove = null;
+        }
+    });
+
+    moveFolderModal.querySelector('#confirmMoveFolderBtn').addEventListener('click', async () => {
+        if (!noteIdToMove || !currentUserUid) return;
+        const selectEl = moveFolderModal.querySelector('#moveFolderSelect');
+        const targetFolderId = selectEl.value;
+        const confirmBtn = moveFolderModal.querySelector('#confirmMoveFolderBtn');
+        confirmBtn.disabled = true;
+
+        try {
+            await updateNote(currentUserUid, noteIdToMove, { folderId: targetFolderId });
+            moveFolderModal.classList.remove('active');
+            noteIdToMove = null;
+            await renderNotes();
+        } catch (err) {
+            console.error('Erro ao mover nota para pasta:', err);
+            alert('Erro ao mover nota para a pasta selecionada.');
+        } finally {
+            confirmBtn.disabled = false;
+        }
+    });
+}
+
+async function openMoveFolderModal(note) {
+    ensureMoveFolderModal();
+    noteIdToMove = note.id;
+
+    const selectEl = moveFolderModal.querySelector('#moveFolderSelect');
+    selectEl.innerHTML = '<option value="all">Todas as Notas (Sem pasta específica)</option>';
+
+    try {
+        const folders = await getFolders(currentUserUid);
+        folders.forEach(folder => {
+            const option = document.createElement('option');
+            option.value = folder.id;
+            option.textContent = folder.name;
+            if (note.folderId === folder.id) {
+                option.selected = true;
+            }
+            selectEl.appendChild(option);
+        });
+    } catch (err) {
+        console.error('Erro ao carregar pastas:', err);
+    }
+
+    moveFolderModal.classList.add('active');
 }
 
 async function renderNotes() {
     if (!currentUserUid || !activeFolderId) {
-        console.warn("⚠️ renderNotes não continuará porque currentUserUid ou activeFolderId está indefinido.");
         return;
     }
 
     if (!notesContainer) {
-        console.error('notesContainer não inicializado - chamar initNotes() primeiro');
-        return;
+        initNotes();
+        if (!notesContainer) return;
     }
-
-    if (!currentUserUid) {
-        console.log("Aguardando autenticação para renderizar notas...");
-        return;
-    }
-
-    console.log("🔥 renderNotes foi chamado com:", {
-        currentUserUid,
-        activeFolderId
-    });
 
     try {
-        notesContainer.classList.remove('hidden'); // Mostra container se estiver oculto
-        notesContainer.innerHTML = ''; // Limpa o container antes de renderizar novas notas
+        notesContainer.classList.remove('hidden');
+        notesContainer.innerHTML = '';
+
+        let notes = [];
+        if (activeFolderId === 'all') {
+            notes = await getNotes(currentUserUid);
+        } else {
+            notes = await getNotes(currentUserUid, activeFolderId);
+        }
+
+        if (notes.length === 0) {
+            renderEmptyState();
+            return;
+        }
+
+        notes.forEach(note => {
+            const noteEl = createNoteElement(note);
+            notesContainer.appendChild(noteEl);
+        });
     } catch (error) {
         console.error('Erro ao renderizar notas:', error);
     }
-    if (!activeFolderId || !currentUserUid) return;
-
-    console.log("🔄 Buscando notas da pasta:", activeFolderId);
-
-    let notes = [];
-
-    if (activeFolderId === 'all') {
-        notes = await getNotes(currentUserUid); // ← Busca todas
-    } else {
-        notes = await getNotes(currentUserUid, activeFolderId); // ← Busca por pasta
-    }
-
-    if (notes.length === 0) {
-        renderEmptyState();
-        return;
-    }
-
-    // Adicione cada nota ao contêiner
-    notes.forEach(note => {
-        const noteEl = createNoteElement(note);
-        notesContainer.appendChild(noteEl);
-        console.log("📄 Criando nota:", note.title);
-    });
-    if (notes.length === 0) {
-        console.log("📭 Nenhuma nota encontrada.");
-        notesContainer.innerHTML = "<p style='color: red;'>Nenhuma nota encontrada nessa pasta.</p>";
-    }
-
 }
 
 function createNoteElement(note) {
@@ -91,13 +171,10 @@ function createNoteElement(note) {
     const content = document.createElement('div');
     content.className = 'note-content';
 
-    // Mostra o início do resumo para notas PDF
-    content.className = 'note-content';
-
     if (note.isWelcome) {
-        content.textContent = 'Transforme PDFs em resumos, flashcards, quizzes e Aúdios com IA.';
+        content.textContent = 'Transforme PDFs em resumos, flashcards, quizzes e áudios com IA.';
     } else {
-        content.innerHTML = note.content; // Exibe todo o conteúdo do resumo, com formatação HTML
+        content.innerHTML = note.content;
     }
 
     const footer = document.createElement('div');
@@ -107,24 +184,37 @@ function createNoteElement(note) {
     actions.className = 'note-actions';
 
     const addToFolder = document.createElement('button');
+    addToFolder.type = 'button';
     addToFolder.innerHTML = '<i class="fa-regular fa-folder"></i> Adicionar pasta';
     addToFolder.addEventListener('click', (e) => {
         e.stopPropagation();
-        // A funcionalidade Adicionar à pasta ficar aqui
+        openMoveFolderModal(note);
     });
 
     const copyText = document.createElement('button');
+    copyText.type = 'button';
     copyText.innerHTML = '<i class="fa-regular fa-copy"></i> Copiar texto';
-    copyText.addEventListener('click', (e) => {
+    copyText.addEventListener('click', async (e) => {
         e.stopPropagation();
-        navigator.clipboard.writeText(note.content);
+        try {
+            const plainText = htmlToPlainText(note.content);
+            await navigator.clipboard.writeText(plainText);
+            const originalHTML = copyText.innerHTML;
+            copyText.innerHTML = '<i class="fa-solid fa-check"></i> Copiado!';
+            setTimeout(() => {
+                copyText.innerHTML = originalHTML;
+            }, 2000);
+        } catch (err) {
+            console.error('Erro ao copiar texto:', err);
+        }
     });
 
     const date = document.createElement('div');
     date.className = 'note-date';
     date.textContent = formatDate(note.createdAt);
-    // novo. excluir nota
+
     const deleteBtn = document.createElement('button');
+    deleteBtn.type = 'button';
     deleteBtn.innerHTML = '<i class="fa-solid fa-trash"></i> Excluir';
     deleteBtn.addEventListener('click', async (e) => {
         e.stopPropagation();
@@ -132,13 +222,12 @@ function createNoteElement(note) {
             try {
                 const fullNote = await getNoteById(currentUserUid, note.id);
 
-                if (fullNote.pdfUrl) {
+                if (fullNote && fullNote.pdfUrl) {
                     try {
                         const publicId = extractPublicIdFromUrl(fullNote.pdfUrl);
                         await deletePdfFromCloudinary(publicId);
                     } catch (error) {
-                        console.error("Erro ao excluir PDF do Cloudinary:", error);
-                        // Não interrompe o fluxo mesmo se falhar a exclusão no Cloudinary
+                        console.warn("Aviso ao excluir PDF do Cloudinary:", error);
                     }
                 }
 
@@ -151,15 +240,7 @@ function createNoteElement(note) {
         }
     });
 
-    // Adicione a função auxiliar para extrair public_id
-    function extractPublicIdFromUrl(url) {
-        const matches = url.match(/upload\/(?:v\d+\/)?([^\.]+)/);
-        return matches ? matches[1] : null;
-    }
-
-    // Adicione o botão às ações
     actions.appendChild(deleteBtn);
-
     actions.appendChild(addToFolder);
     actions.appendChild(copyText);
 
@@ -192,7 +273,6 @@ function renderEmptyState() {
     notesContainer.appendChild(emptyEl);
 }
 
-// Modifique a função openNote
 async function openNote(noteId) {
     try {
         const note = await getNoteById(currentUserUid, noteId);
@@ -209,6 +289,7 @@ async function openNote(noteId) {
             `;
         }
 
+        window.currentOpenedNoteId = note.id;
         window.currentOpenedNoteContent = note.content;
 
         // Atualização segura da UI
@@ -219,43 +300,22 @@ async function openNote(noteId) {
         document.querySelectorAll(".container__nota").forEach(sec => sec.classList.add("hidden"));
         document.getElementById("notas")?.classList.remove("hidden");
 
-        document.querySelectorAll(".btn").forEach(btn => btn.classList.remove("notaActive"));
+        document.querySelectorAll(".botoes .btn").forEach(btn => btn.classList.remove("notaActive"));
         document.querySelector('.btn[data-target="notas"]')?.classList.add("notaActive");
 
         if (!note.isWelcome) {
             window.customFlashcards = note.flashcards || [];
             window.customQuiz = note.quiz || [];
-            console.log("📝 Flashcards personalizados carregados:", window.customFlashcards);
-            console.log("📝 Quiz personalizado carregado:", window.customQuiz);
         } else {
             window.customFlashcards = null;
             window.customQuiz = null;
         }
 
+        updateFlashcardsUI();
+        updateQuizUI();
     } catch (error) {
         console.error('Erro ao abrir nota:', error);
         alert("Erro ao carregar a nota");
-    }
-
-    updateFlashcardsUI();
-    updateQuizUI();
-
-}
-
-async function createNewNote() {
-    if (!activeFolderId || !currentUserUid) return;
-
-    const newNote = {
-        title: 'Nova anotação',
-        content: 'Clique para editar esta anotação.',
-        folderId: activeFolderId
-    };
-
-    try {
-        const note = await createNote(currentUserUid, newNote);
-        //renderNotes(); // recarrega as notas na tela
-    } catch (err) {
-        console.error("Erro ao criar nova nota:", err);
     }
 }
 
@@ -264,7 +324,6 @@ function formatDate(date) {
     if (!(date instanceof Date)) {
         date = new Date(date.seconds ? date.seconds * 1000 : date);
     }
-
 
     const today = new Date();
     const yesterday = new Date(today);
@@ -288,36 +347,8 @@ function formatDate(date) {
     }
 }
 
-// Adicione esta função para mostrar a view de nota
-
-//novo
 function showNoteView(noteId) {
-    const note = store.getNotes().find(n => n.id === noteId);
-    if (note) {
-        // Atualiza o conteúdo da nota
-        document.querySelector('#notas .container__nota__resumo').innerHTML = `
-            <h1>${note.title}</h1>
-            <p>${note.content}</p>
-        `;
-
-        // Mostra o container principal
-        document.getElementById('noteContentContainer').classList.remove('hidden');
-        document.querySelector('.nova-nota-section').classList.add('hidden');
-        document.getElementById('notes-container').classList.add('hidden');
-
-        // 👇 Corrige: mostra seção "Notas" e oculta as outras
-        document.querySelectorAll(".container__nota").forEach(sec => sec.classList.add("hidden"));
-        document.getElementById("notas").classList.remove("hidden");
-
-        // Atualiza botões
-        document.querySelectorAll(".btn").forEach(btn => btn.classList.remove("notaActive"));
-        document.querySelector('.btn[data-target="notas"]').classList.add("notaActive");
-    }
+    return openNote(noteId);
 }
-
-// Modifique o event listener no app.js
-document.getElementById('currentFolder').addEventListener('click', () => {
-    showMainView();
-});
 
 export { initNotes, renderNotes, showNoteView };

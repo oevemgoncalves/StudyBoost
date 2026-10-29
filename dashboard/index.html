@@ -62,7 +62,7 @@
             <h2>Baixar PDF</h2>
 
             <label class="upload-area" id="uploadArea" for="fileInput">
-                <span id="uploadText">Clique para selecionar seu arquivo PDF</span>
+                <span id="uploadText">Clique ou arraste seu arquivo PDF aqui</span>
             </label>
 
             <input type="file" id="fileInput" accept=".pdf" />
@@ -78,7 +78,7 @@
     </div>
 
     <!-- Botão seta (apenas visível no mobile) -->
-    <button class="toggle-arrow" id="toggleArrow" aria-label="Abrir/Fechar menu lateral" onclick="toggleSidebar()">
+    <button class="toggle-arrow" id="toggleArrow" aria-label="Abrir/Fechar menu lateral">
         <i class="fa-regular fa-square-caret-right"></i>
     </button>
 
@@ -95,25 +95,13 @@
             <div class="nova-nota-section">
                 <h2 class="titulo__main__novapasta">Nova nota</h2>
                 <p class="main__texto">Registre seus pensamentos, ideias e tarefas em uma nota. Você também pode
-                    adicionar</p>
+                    adicionar um arquivo PDF para gerar resumos, flashcards, quizzes e áudios com IA.</p>
 
                 <div class="media-buttons">
-                    <!-- <button class="media-btn">
-                        <i class="fa-solid fa-microphone"></i>
-                        Gravar áudio
-                    </button>
-                    <button class="media-btn">
-                        <i class="fa-solid fa-share-from-square"></i>
-                        Enviar áudio
-                    </button> -->
                     <button class="media-btn" id="abrirUploadModalBtn">
                         <i class="fa-solid fa-file-pdf"></i>
                         Upload PDF
                     </button>
-                    <!-- <button class="media-btn">
-                        <i class="fa-brands fa-youtube"></i>
-                        Vídeo do YouTube
-                    </button> -->
                 </div>
             </div>
 
@@ -174,9 +162,9 @@
 
 
                 <div class="controls">
-                    <button id="prev" onclick="prevCard()" style="visibility: hidden;">← Anterior</button>
-                    <span class="counter" id="counter">Cartão 1 de 16</span>
-                    <button id="next" onclick="nextCard()">Próximo →</button>
+                    <button id="prev" style="visibility: hidden;">← Anterior</button>
+                    <span class="counter" id="flashcard-counter">Cartão 1 de 5</span>
+                    <button id="next">Próximo →</button>
                 </div>
             </section>
             <section id="audio" class="container__nota hidden">

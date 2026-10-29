@@ -1,6 +1,6 @@
-from weakref import ref
 from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware #para ajudar com o CORS
+from fastapi.middleware.cors import CORSMiddleware # para ajudar com o CORS
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from dotenv import load_dotenv
 from gtts import gTTS
@@ -8,34 +8,41 @@ import requests
 import fitz  # PyMuPDF
 import os
 import re
+import io
+import json
 import uuid
 import google.generativeai as genai
 import traceback
 
-load_dotenv() #carrega as variáveis do .env
+load_dotenv() # carrega as variáveis do .env
 
 app = FastAPI()
 
 # 🔼 Configure CORS aqui
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://127.0.0.1:5502", "https://study-boost-smoky.vercel.app"], 
+    allow_origins=[
+        "http://127.0.0.1:5500",
+        "http://localhost:5500",
+        "http://127.0.0.1:5502",
+        "http://localhost:5502",
+        "https://study-boost-smoky.vercel.app"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-   
 )
 
 def gerar_tabela_html(linhas):
-            tabela_html = '<table border="1" cellpadding="6" cellspacing="0" style="border-collapse: collapse; width: 100%;">\n<thead><tr><th>Categoria</th><th>Descrição</th></tr></thead><tbody>\n'
-            for linha in linhas:
-                partes = linha.split(':', 1)
-                if len(partes) == 2:
-                    chave = partes[0].strip()
-                    valor = partes[1].strip()
-                    tabela_html += f"<tr><td><strong>{chave}</strong></td><td>{valor}</td></tr>\n"
-            tabela_html += "</tbody></table>\n"
-            return tabela_html
+    tabela_html = '<table border="1" cellpadding="6" cellspacing="0" style="border-collapse: collapse; width: 100%;">\n<thead><tr><th>Categoria</th><th>Descrição</th></tr></thead><tbody>\n'
+    for linha in linhas:
+        partes = linha.split(':', 1)
+        if len(partes) == 2:
+            chave = partes[0].strip()
+            valor = partes[1].strip()
+            tabela_html += f"<tr><td><strong>{chave}</strong></td><td>{valor}</td></tr>\n"
+    tabela_html += "</tbody></table>\n"
+    return tabela_html
 
 @app.get("/")
 def read_root():
@@ -58,30 +65,24 @@ def extract_text_from_pdf(pdf_path):
 
 @app.post("/gerar-resumo")
 async def gerar_resumo(req: PDFRequest):
+    temp_filename = f"{uuid.uuid4()}.pdf"
     try:
         print("✅ Endpoint /gerar-resumo acionado")
         print("🔗 URL recebida:", req.pdf_url)
         # 🔽 Baixa o PDF do Cloudinary (ou qualquer URL pública)
-        response = requests.get(req.pdf_url)
+        response = requests.get(req.pdf_url, timeout=30)
         if response.status_code != 200:
             raise HTTPException(status_code=400, detail="Erro ao baixar o PDF")
 
         # 📁 Salva temporariamente com um nome único
-        temp_filename = f"{uuid.uuid4()}.pdf"
         with open(temp_filename, "wb") as f:
             f.write(response.content)
 
         # 📄 Extrai o texto
         texto = extract_text_from_pdf(temp_filename)
 
-        # print("🧪 Texto extraído do PDF (primeiros 500 caracteres):")
-        # print(texto[:500]) 
-
-        # 🧼 Remove o arquivo temporário
-        os.remove(temp_filename)
-
         if not texto.strip():
-            raise HTTPException(status_code=400, detail="PDF está vazio")
+            raise HTTPException(status_code=400, detail="PDF está vazio ou não contém texto extraível")
 
         # 💡 Solicita resumo à IA Gemini
         model = genai.GenerativeModel("models/gemini-2.0-flash")
@@ -148,11 +149,21 @@ async def gerar_resumo(req: PDFRequest):
 
         return {"resumo": resumo}
 
+    except HTTPException:
+        raise
     except Exception as e:
         print("❌ ERRO COMPLETO:")
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Erro ao processar PDF: {str(e)}")
-    
+    finally:
+        # 🧼 Garante remoção do arquivo temporário mesmo em caso de erro
+        if os.path.exists(temp_filename):
+            try:
+                os.remove(temp_filename)
+            except OSError:
+                pass
+
+
 class ResumoRequest(BaseModel):
     resumo: str
 
@@ -189,7 +200,7 @@ async def gerar_flashcards_e_quiz(req: ResumoRequest):
         {req.resumo}
         """
 
-        model = genai.GenerativeModel("models/gemini-2.0-flash")  # Ou o modelo que você quiser
+        model = genai.GenerativeModel("models/gemini-2.0-flash")
         response = model.generate_content(prompt)
 
         raw_text = response.candidates[0].content.parts[0].text
@@ -199,7 +210,6 @@ async def gerar_flashcards_e_quiz(req: ResumoRequest):
         json_end = raw_text.rfind('}') + 1
         json_str = raw_text[json_start:json_end]
 
-        import json
         resultado = json.loads(json_str)
 
         return resultado
@@ -216,19 +226,27 @@ class AudioRequest(BaseModel):
 @app.post("/gerar-audio")
 async def gerar_audio(req: AudioRequest):
     try:
-        # Gera o áudio a partir do texto recebido
-        tts = gTTS(text=req.texto, lang='pt-br')
-        output_filename = "output.mp3"
-        tts.save(output_filename)
+        # Remove tags HTML caso o texto venha formatado em HTML
+        texto_limpo = re.sub(r'<[^>]+>', ' ', req.texto)
+        texto_limpo = re.sub(r'\s+', ' ', texto_limpo).strip()
 
-        # Retorna o áudio como bytes (para download direto)
-        from fastapi.responses import FileResponse
-        return FileResponse(output_filename, media_type="audio/mpeg", filename="resumo.mp3")
+        if not texto_limpo:
+            raise HTTPException(status_code=400, detail="Texto vazio para geração de áudio.")
 
+        # Gera o áudio em memória a partir do texto recebido
+        tts = gTTS(text=texto_limpo, lang='pt-br')
+        mp3_fp = io.BytesIO()
+        tts.write_to_fp(mp3_fp)
+        mp3_fp.seek(0)
+
+        return StreamingResponse(
+            mp3_fp,
+            media_type="audio/mpeg",
+            headers={"Content-Disposition": 'inline; filename="resumo.mp3"'}
+        )
+
+    except HTTPException:
+        raise
     except Exception as e:
         print("❌ Erro ao gerar áudio:", e)
         raise HTTPException(status_code=500, detail=f"Erro ao gerar áudio: {str(e)}")
-# url = "https://res.cloudinary.com/dyqp5onvs/raw/upload/v1749671411/jsrwmwnf78iymaa30o8b.pdf"
-# res = requests.get(url)
-# print(res.status_code)
-# print(res.headers.get("Content-Type"))

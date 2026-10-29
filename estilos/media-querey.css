@@ -17,7 +17,6 @@
     .cabecalho span{
         display: flex;
         flex-direction: row;
-
     }
     .hero {
         background-color: var(--cor-primaria);
@@ -42,7 +41,6 @@
         font-size: 1em;
     }
 
-
     .conteiner__img{
         position: relative;
         top: -10px;
@@ -54,7 +52,6 @@
         width: 290px;
     }
 
-    
     .botao {
         background-color: var(--cor-terciaria);
         width: 200px;
@@ -76,7 +73,7 @@
         justify-content: space-evenly;
         align-items: center;
         padding: 0;
-        height: 52vh;
+        min-height: 52vh;
     }
 
     .conteiner__conteudo {
@@ -105,12 +102,11 @@
     }
 }
 
-@media screen and (min-width: 993px)and (max-width: 1920px) {
+@media screen and (min-width: 993px) {
     /*DESKTOP*/
     .cabecalho span{
         display: flex;
         flex-direction: row;
-
     }
     .hero {
         background-color: var(--cor-primaria);
@@ -146,7 +142,6 @@
         width: 350px;
     }
 
-    
     .botao {
         background-color: var(--cor-terciaria);
         width: 200px;

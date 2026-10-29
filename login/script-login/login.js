@@ -1,7 +1,7 @@
 import { auth } from "../../firebase-config.js";
 import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
 
-// Configuração do toggle password (seu código existente)
+// Configuração do toggle password
 document.addEventListener("DOMContentLoaded", function () {
   const toggleButtons = document.querySelectorAll(".toggle-password");
 
@@ -28,12 +28,19 @@ document.addEventListener("DOMContentLoaded", function () {
   // Adicionando a autenticação
   const loginForm = document.getElementById("registerForm");
   const errorMessage = document.getElementById("error-message");
+  const submitBtn = loginForm.querySelector('button[type="submit"]');
 
   loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value;
+
+    errorMessage.style.display = "none";
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Entrando...";
+    }
 
     try {
       // Tenta fazer login
@@ -43,7 +50,7 @@ document.addEventListener("DOMContentLoaded", function () {
       console.log("Usuário logado:", user);
 
       // Redireciona para a dashboard
-      window.location.href = "../../dashboard/index.html";
+      window.location.href = "../dashboard/index.html";
 
     } catch (error) {
       let errorMsg = "";
@@ -58,6 +65,12 @@ document.addEventListener("DOMContentLoaded", function () {
         case "auth/wrong-password":
           errorMsg = "Senha incorreta.";
           break;
+        case "auth/invalid-email":
+          errorMsg = "Formato de e-mail inválido.";
+          break;
+        case "auth/too-many-requests":
+          errorMsg = "Muitas tentativas. Aguarde alguns instantes e tente novamente.";
+          break;
         default:
           errorMsg = "Erro ao fazer login. Tente novamente.";
       }
@@ -65,6 +78,11 @@ document.addEventListener("DOMContentLoaded", function () {
       errorMessage.textContent = errorMsg;
       errorMessage.style.display = "block";
       console.error("Erro de login:", error);
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Entrar";
+      }
     }
   });
 });

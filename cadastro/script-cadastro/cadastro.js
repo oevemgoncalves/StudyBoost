@@ -1,17 +1,17 @@
 // cadastro.js
-import { auth } from "../../firebase-config.js"; // Agora o auth existe!
-import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js"; // Atualize para v11.8.0
-import { updateProfile } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
+import { auth } from "../../firebase-config.js";
+import { createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
 
-//autenticação de usuário
+// Autenticação de usuário
 document.getElementById("registerForm").addEventListener("submit", async function (event) {
   event.preventDefault(); // Previne envio automático
 
-  let password = document.getElementById("password").value;
-  let confirmPassword = document.getElementById("confirmPassword");
-  let confirmContainer = confirmPassword.parentElement;
-  let errorMessage = document.getElementById("error-message");
+  const password = document.getElementById("password").value;
+  const confirmPassword = document.getElementById("confirmPassword");
+  const confirmContainer = confirmPassword.parentElement;
+  const errorMessage = document.getElementById("error-message");
   const displayName = document.getElementById("username").value.trim();
+  const registerBtn = document.getElementById("registerBtn");
 
   if (password !== confirmPassword.value) {
     errorMessage.textContent = "As senhas não coincidem!";
@@ -23,18 +23,27 @@ document.getElementById("registerForm").addEventListener("submit", async functio
     confirmContainer.classList.remove("input-error");
   }
 
-  const email = document.getElementById("email").value;
+  if (password.length < 6) {
+    errorMessage.textContent = "A senha deve ter pelo menos 6 caracteres.";
+    errorMessage.style.display = "block";
+    return;
+  }
+
+  const email = document.getElementById("email").value.trim();
+
+  // Validação do e-mail
+  if (!email || !email.includes("@") || !email.includes(".")) {
+    errorMessage.textContent = "E-mail inválido! Use o formato: usuario@exemplo.com";
+    errorMessage.style.display = "block";
+    return;
+  }
+
+  if (registerBtn) {
+    registerBtn.disabled = true;
+    registerBtn.textContent = "Cadastrando...";
+  }
+
   try {
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value;
-
-    // Validação do e-mail
-    if (!email || !email.includes("@") || !email.includes(".")) {
-      errorMessage.textContent = "E-mail inválido! Use o formato: usuario@exemplo.com";
-      errorMessage.style.display = "block";
-      return;
-    }
-
     // Prossegue se o e-mail for válido
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
 
@@ -45,14 +54,29 @@ document.getElementById("registerForm").addEventListener("submit", async functio
 
     console.log("Usuário criado:", userCredential.user);
     alert("Cadastro realizado com sucesso!");
-    window.location.href = "../../login/login.html"; // Redireciona para a página de login após o cadastro
+    window.location.href = "../login/login.html"; // Redireciona para a página de login após o cadastro
   } catch (error) {
     console.error("Erro ao cadastrar:", error);
-    errorMessage.textContent = "Erro: " + error.message;
+    let errorMsg = "Erro ao realizar cadastro. Tente novamente.";
+    switch (error.code) {
+      case "auth/email-already-in-use":
+        errorMsg = "Este e-mail já está em uso.";
+        break;
+      case "auth/invalid-email":
+        errorMsg = "Formato de e-mail inválido.";
+        break;
+      case "auth/weak-password":
+        errorMsg = "A senha é muito fraca (mínimo de 6 caracteres).";
+        break;
+    }
+    errorMessage.textContent = errorMsg;
     errorMessage.style.display = "block";
+  } finally {
+    if (registerBtn) {
+      registerBtn.disabled = false;
+      registerBtn.textContent = "Cadastrar";
+    }
   }
-
-  console.log("Formulário enviado!");
 });
 
 // Função para alternar a visibilidade da senha
@@ -79,4 +103,3 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 });
-

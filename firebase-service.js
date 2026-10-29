@@ -9,7 +9,8 @@ import {
   updateDoc,
   deleteDoc,
   query,
-  where
+  where,
+  writeBatch
 } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
 
 export async function createNote(userId, note) {
@@ -17,19 +18,31 @@ export async function createNote(userId, note) {
     throw new Error("❌ userId está indefinido ao acessar o Firestore.");
   }
 
+  const now = new Date();
   const notesRef = collection(db, 'users', userId, 'notes');
   const docRef = await addDoc(notesRef, {
     title: note.title,
     content: note.content,
-    folderId: note.folderId,
-    createdAt: new Date(),
+    folderId: note.folderId || 'all',
+    createdAt: now,
     isWelcome: note.isWelcome || false,
     pdfUrl: note.pdfUrl || null,
     flashcards: note.flashcards || [],
     quiz: note.quiz || []
-});
+  });
 
-  return { id: docRef.id, ...note, createdAt: new Date() };
+  return { id: docRef.id, ...note, createdAt: now };
+}
+
+/**
+ * Atualiza uma nota existente no Firestore.
+ */
+export async function updateNote(userId, noteId, updates) {
+  if (!userId || !noteId) {
+    throw new Error("❌ userId ou noteId indefinido ao atualizar nota.");
+  }
+  const noteRef = doc(db, 'users', userId, 'notes', noteId);
+  await updateDoc(noteRef, updates);
 }
 
 /**
@@ -40,12 +53,13 @@ export async function createFolder(userId, name) {
     throw new Error("❌ userId está indefinido ao acessar o Firestore.");
   }
 
+  const now = new Date();
   const foldersRef = collection(db, 'users', userId, 'folders');
   const docRef = await addDoc(foldersRef, {
     name: name,
-    createdAt: new Date()
+    createdAt: now
   });
-  return { id: docRef.id, name, createdAt: new Date() };
+  return { id: docRef.id, name, createdAt: now };
 }
 
 /**
@@ -60,14 +74,21 @@ export async function getFolders(userId) {
   const snapshot = await getDocs(foldersRef);
 
   const folders = [];
-  snapshot.forEach(doc => {
+  snapshot.forEach(docSnap => {
     folders.push({
-      id: doc.id,
-      ...doc.data()
+      id: docSnap.id,
+      ...docSnap.data()
     });
   });
-  return folders;
 
+  // Ordena por data de criação (mais antigas primeiro para manter ordem na sidebar)
+  folders.sort((a, b) => {
+    const timeA = a.createdAt?.seconds ? a.createdAt.seconds * 1000 : new Date(a.createdAt || 0).getTime();
+    const timeB = b.createdAt?.seconds ? b.createdAt.seconds * 1000 : new Date(b.createdAt || 0).getTime();
+    return timeA - timeB;
+  });
+
+  return folders;
 }
 
 /**
@@ -100,10 +121,19 @@ export async function getNotes(userId, folderId = null) {
   }
 
   const snapshot = await getDocs(q);
-  return snapshot.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data()
+  const notes = snapshot.docs.map(docSnap => ({
+    id: docSnap.id,
+    ...docSnap.data()
   }));
+
+  // Ordena as notas: mais recentes primeiro (nota de boas-vindas por último se houver outras)
+  notes.sort((a, b) => {
+    const timeA = a.createdAt?.seconds ? a.createdAt.seconds * 1000 : new Date(a.createdAt || 0).getTime();
+    const timeB = b.createdAt?.seconds ? b.createdAt.seconds * 1000 : new Date(b.createdAt || 0).getTime();
+    return timeB - timeA;
+  });
+
+  return notes;
 }
 
 export async function createWelcomeNoteIfNeeded(userId) {
@@ -120,10 +150,10 @@ export async function createWelcomeNoteIfNeeded(userId) {
   if (snapshot.empty) {
     await addDoc(notesRef, {
       title: 'Bem-vindo ao StudyBoost',
-      content: `<p>Transforme PDFs em resumos, flashcards, quizzes e Aúdios com IA.</p>
+      content: `<p>Transforme PDFs em resumos, flashcards, quizzes e áudios com IA.</p>
         <br />
 
-        <h2>Bem-vindo ao StudyBoost seu companheiro de estudo </h2>
+        <h2>Bem-vindo ao StudyBoost, seu companheiro de estudo</h2>
         <p><strong>StudyBoost</strong> é uma plataforma inovadora que utiliza tecnologia avançada de <strong>Inteligência Artificial</strong> para transformar PDFs em <strong>resumos inteligentes</strong>, <strong>flashcards</strong> e <strong>quizzes interativos</strong>. Ideal para estudantes e profissionais, o StudyBoost organiza o conteúdo em pastas personalizadas e torna o aprendizado mais eficiente, dinâmico e acessível.</p>
 
         <br />
@@ -180,8 +210,7 @@ export async function deleteNote(userId, noteId) {
   await deleteDoc(noteRef);
 }
 
-// Adicione estas funções no firebase-service.js
-
+// Exclui todas as notas de uma pasta usando writeBatch
 export async function deleteAllNotesInFolder(userId, folderId) {
   const notes = await getNotes(userId, folderId);
   const batch = writeBatch(db);

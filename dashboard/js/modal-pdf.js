@@ -2,9 +2,9 @@
 import { createNote } from '../../firebase-service.js';
 import { activeFolderId, currentUserUid } from './folders.js';
 import { renderNotes } from './notes.js';
-//import { uploadPdfToCloudinary } from '../../upload-service.js';
 
 let modalPdfInitialized = false;
+
 function initModalPdf() {
     if (modalPdfInitialized) return;
     modalPdfInitialized = true;
@@ -14,8 +14,6 @@ function initModalPdf() {
     const closeBtn = document.getElementById('closeUploadModalBtn');
     const fileInput = document.getElementById('fileInput');
     const gerarNotaBtn = document.getElementById('btnGerarNota');
-    const pdfPreviewContainer = document.getElementById('pdfPreviewContainer');
-    const pdfPreview = document.getElementById('pdfPreview');
     const removePdfBtn = document.getElementById('removePdfBtn');
     const viewPdfBtn = document.getElementById('viewPdfBtn');
     const uploadArea = document.getElementById('uploadArea');
@@ -23,108 +21,147 @@ function initModalPdf() {
     const modalContainer = document.querySelector('.container__modal-pdf');
     const pdfActions = document.getElementById('pdfActions');
     let selectedFile = null;
-
-
+    let isProcessing = false;
 
     if (!modalPDF || !openBtn || !closeBtn || !fileInput || !gerarNotaBtn) {
         console.warn('Algum elemento do modal PDF não foi encontrado.');
         return;
     }
 
-    // Abrir o modal
-    openBtn.addEventListener('click', () => {
-        modalPDF.classList.remove('hidden');
-        modalPDF.classList.add('active');
-        document.body.classList.add('modal-open');
-    });
-
-    //Fechar o modal
-    closeBtn.addEventListener('click', () => {
-        resetFileInput();
-        modalPDF.classList.remove('active');
-        modalPDF.classList.add('hidden');
-        document.body.classList.remove('modal-open');
-    });
-
     // Função para limpar seleção
     function resetFileInput() {
         fileInput.value = '';
-        pdfActions.classList.add('hidden');
+        if (pdfActions) pdfActions.classList.add('hidden');
         selectedFile = null;
         enableUploadArea();
-        modalContainer.classList.remove('pdf-selected'); // Remove classe para diminuir o modal
+        if (modalContainer) modalContainer.classList.remove('pdf-selected');
     }
 
-    // Modifique o event listener do fileInput
-    fileInput.addEventListener('change', (e) => {
-        selectedFile = e.target.files[0];
-        if (selectedFile && selectedFile.type === 'application/pdf') {
-            pdfActions.classList.remove('hidden');
-            disableUploadArea();
-            modalContainer.classList.add('pdf-selected'); // Adiciona classe para aumentar o modal
+    function openUploadModal() {
+        modalPDF.classList.remove('hidden');
+        document.body.classList.add('modal-open');
+        setTimeout(() => {
+            modalPDF.classList.add('active');
+        }, 10);
+    }
+
+    function closeUploadModal() {
+        if (isProcessing) return;
+        resetFileInput();
+        modalPDF.classList.remove('active');
+        document.body.classList.remove('modal-open');
+        setTimeout(() => {
+            modalPDF.classList.add('hidden');
+        }, 300);
+    }
+
+    // Abrir o modal
+    openBtn.addEventListener('click', openUploadModal);
+
+    // Fechar o modal
+    closeBtn.addEventListener('click', closeUploadModal);
+
+    // Fechar ao clicar fora do modal
+    modalPDF.addEventListener('click', (e) => {
+        if (e.target === modalPDF) {
+            closeUploadModal();
+        }
+    });
+
+    function handleSelectedFile(file) {
+        if (file && (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf'))) {
+            selectedFile = file;
+            if (pdfActions) pdfActions.classList.remove('hidden');
+            disableUploadArea(file.name);
+            if (modalContainer) modalContainer.classList.add('pdf-selected');
         } else {
             alert('Por favor, selecione um arquivo PDF válido.');
             resetFileInput();
         }
+    }
+
+    // Seleção via input de arquivo
+    fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            handleSelectedFile(file);
+        }
     });
+
+    // Suporte a Drag & Drop na área de upload
+    if (uploadArea) {
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            if (!selectedFile) {
+                uploadArea.style.borderColor = '#3b82f6';
+                uploadArea.style.backgroundColor = '#eff6ff';
+            }
+        });
+
+        uploadArea.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = '';
+            uploadArea.style.backgroundColor = '';
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = '';
+            uploadArea.style.backgroundColor = '';
+            if (selectedFile) return;
+
+            const droppedFile = e.dataTransfer?.files?.[0];
+            if (droppedFile) {
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(droppedFile);
+                fileInput.files = dataTransfer.files;
+                handleSelectedFile(droppedFile);
+            }
+        });
+    }
 
     // Visualizar PDF em nova guia
-    viewPdfBtn.addEventListener('click', () => {
-        if (selectedFile) {
-            const fileURL = URL.createObjectURL(selectedFile);
-            window.open(fileURL, '_blank');
-            // Libera a memória depois de um tempo (opcional)
-            setTimeout(() => URL.revokeObjectURL(fileURL), 1000);
-        }
-    });
+    if (viewPdfBtn) {
+        viewPdfBtn.addEventListener('click', () => {
+            if (selectedFile) {
+                const fileURL = URL.createObjectURL(selectedFile);
+                window.open(fileURL, '_blank');
+                setTimeout(() => URL.revokeObjectURL(fileURL), 60000);
+            }
+        });
+    }
 
     // Remover PDF
-    removePdfBtn.addEventListener('click', () => {
-        resetFileInput();
-    });
-
-    // Atualize também o fechamento do modal
-    closeBtn.addEventListener('click', () => {
-        resetFileInput();
-        if (pdfPreview) {
-            if (pdfPreview.src) {
-                URL.revokeObjectURL(pdfPreview.src);
-            }
-            pdfPreview.src = '';
-        }
-        fileInput.value = '';
-        pdfPreview.src = '';
-        pdfPreviewContainer.classList.add('hidden');
-        viewPdfBtn.classList.add('hidden');
-        selectedFile = null;
-        modalPDF.classList.remove('active');
-        modalPDF.classList.add('hidden');
-        document.body.classList.remove('modal-open');
-    });
+    if (removePdfBtn) {
+        removePdfBtn.addEventListener('click', () => {
+            resetFileInput();
+        });
+    }
 
     // Função para desativar a área de upload
-    function disableUploadArea() {
-        uploadArea.classList.add('disabled');
-        uploadText.textContent = "PDF selecionado"; // Altera o texto
+    function disableUploadArea(fileName) {
+        if (uploadArea) uploadArea.classList.add('disabled');
+        if (uploadText) uploadText.textContent = fileName ? `📄 ${fileName}` : "PDF selecionado";
     }
 
     // Função para reativar a área de upload
     function enableUploadArea() {
-        uploadArea.classList.remove('disabled');
-        uploadText.textContent = "Clique para selecionar seu arquivo PDF"; // Volta ao texto original
+        if (uploadArea) uploadArea.classList.remove('disabled');
+        if (uploadText) uploadText.textContent = "Clique ou arraste seu arquivo PDF aqui";
     }
 
     // Quando o botão "Gerar Nota" for clicado
     gerarNotaBtn.addEventListener('click', async () => {
-        console.log("⚡ Cliquei no botão de upload")
-        const file = fileInput.files[0];
+        const file = selectedFile || fileInput.files[0];
         if (!file) {
             alert('Selecione um arquivo PDF primeiro.');
             return;
         }
 
+        isProcessing = true;
         gerarNotaBtn.disabled = true;
-        gerarNotaBtn.textContent = 'Processando...';
+        if (removePdfBtn) removePdfBtn.disabled = true;
+        gerarNotaBtn.textContent = '1/3 Enviando PDF... ⏳';
 
         try {
             // 1. Upload para Cloudinary
@@ -147,9 +184,9 @@ function initModalPdf() {
             console.log("📤 PDF enviado para Cloudinary:", pdfUrl);
 
             // 2. Chamada para o back-end com a URL do PDF
+            gerarNotaBtn.textContent = '2/3 Gerando resumo com IA... 🧠';
             const resumoRes = await fetch("https://studyboost-backend.onrender.com/gerar-resumo", {
                 method: "POST",
-                //mode: "cors",
                 headers: {
                     "Content-Type": "application/json",
                     "Accept": "application/json"
@@ -157,27 +194,22 @@ function initModalPdf() {
                 body: JSON.stringify({ pdf_url: pdfUrl })
             });
 
-            console.log("Status da resposta:", resumoRes.status);
-            let resumoData;
-
             if (!resumoRes.ok) {
                 const erroTexto = await resumoRes.text();
                 throw new Error(`Erro HTTP ${resumoRes.status}: ${erroTexto}`);
             }
 
+            let resumoData;
             try {
                 resumoData = await resumoRes.json();
                 console.log("✅ Resumo recebido da IA:", resumoData);
             } catch (jsonErr) {
-                const textoBruto = await resumoRes.text();
                 console.error("❌ Erro ao converter para JSON:", jsonErr);
-                console.log("⚠️ Conteúdo bruto da resposta:", textoBruto);
                 throw new Error("Erro ao interpretar resposta da IA");
             }
 
-            console.log("Resumo recebido da IA:", resumoData);
-
-            // Agora... Vamos gerar Flashcards e Quiz com base no resumo
+            // 3. Gerar Flashcards e Quiz com base no resumo
+            gerarNotaBtn.textContent = '3/3 Gerando Flashcards e Quiz... ✨';
             let flashcards = [];
             let quiz = [];
 
@@ -197,19 +229,19 @@ function initModalPdf() {
                 const flashQuizData = await flashQuizRes.json();
                 console.log("✅ Flashcards e Quiz gerados:", flashQuizData);
 
-                flashcards = flashQuizData.flashcards;
-                quiz = flashQuizData.quiz;
-
+                flashcards = Array.isArray(flashQuizData.flashcards) ? flashQuizData.flashcards : [];
+                quiz = Array.isArray(flashQuizData.quiz) ? flashQuizData.quiz : [];
             } catch (error) {
                 console.error("❌ Erro ao gerar Flashcards e Quiz:", error);
-                alert("Falha ao gerar Flashcards e Quiz. A nota será salva apenas com o resumo.");
+                alert("Aviso: Falha ao gerar Flashcards e Quiz. A nota será salva com o resumo.");
             }
 
-            // Agora cria a nota no Firebase com flashcards e quiz inclusos
+            // 4. Cria a nota no Firebase com flashcards e quiz inclusos
+            gerarNotaBtn.textContent = 'Salvando nota... 💾';
             const note = {
                 title: file.name.replace(/\.pdf$/i, ''),
                 content: resumoData.resumo,
-                folderId: activeFolderId,
+                folderId: activeFolderId || 'all',
                 pdfUrl: pdfUrl,
                 createdAt: new Date(),
                 isPdf: true,
@@ -219,30 +251,20 @@ function initModalPdf() {
             };
 
             await createNote(currentUserUid, note);
-            closeBtn.click();
-            renderNotes();
-
+            isProcessing = false;
+            closeUploadModal();
+            await renderNotes();
 
         } catch (err) {
             console.error("❌ Erro ao processar PDF:", err);
-
-            if (err instanceof SyntaxError) {
-                console.log("🔎 Isso parece um erro de JSON.parse()");
-            } else if (err instanceof TypeError) {
-                console.log("🚫 Erro de conexão com o back-end (fetch falhou?)");
-            }
-
             alert("Erro: " + (err.message || err.toString() || "Erro desconhecido"));
-
         } finally {
+            isProcessing = false;
             gerarNotaBtn.disabled = false;
+            if (removePdfBtn) removePdfBtn.disabled = false;
             gerarNotaBtn.textContent = 'Gerar Nota';
         }
-
-
     });
 }
-
-//}
 
 export { initModalPdf };

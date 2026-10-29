@@ -23,8 +23,8 @@
 }
 
 body {
-    height: 100vh;
-
+    min-height: 100vh;
+    overflow-x: hidden;
 }
 
 /*mobile*/
@@ -66,7 +66,6 @@ span img {
     display: flex;
     flex-flow: row nowrap;
     justify-content: space-evenly;
-
 }
 
 .menu__ul__li a {
@@ -92,7 +91,7 @@ span img {
 }
 
 .hero{
-    height: 340px;
+    min-height: 340px;
     color: var(--cor-terciaria);
 }
 
@@ -122,28 +121,34 @@ span img {
     background-color: var(--cor-primaria);
     display: flex;
     justify-content: center;
+    align-items: center;
     text-align: center;
     width: 140px;
     margin-top: 20px;
-    padding: 13px;
     border-radius: 10px;
     box-shadow: 1px 1px 6px #00000053;
     z-index: 999;
     cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
 }
 
 .botao:hover {
-    background-color: var(--cor-acao-botao);  
+    background-color: var(--cor-acao-botao);
+    transform: translateY(-2px);
 }
 
 .botao:active{
     background-color: var(--cor-acao-botao);
+    transform: translateY(0);
 }
 
 .botao__link {
+    display: block;
+    width: 100%;
+    padding: 13px;
     font-family: var(--font-secundaria);
     font-size: 0.9em;
-    font-weight: 300;
+    font-weight: 500;
     color: var(--cor-terciaria);
 }
 
@@ -178,7 +183,7 @@ div.conteiner__lendo {
 .conteiner {
     background-color: var(--cor-primaria);
     color: var(--cor-terciaria);
-    height: 360px;
+    min-height: 360px;
     padding: 15px 20px;
     line-height: 1.2em;
 }
@@ -205,4 +210,3 @@ div.conteiner__lendo {
     text-align: center;
     padding: 15px;
 }
-

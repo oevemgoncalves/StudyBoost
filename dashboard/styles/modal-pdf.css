@@ -30,20 +30,20 @@
     background-color: var(--cor-terciaria);
     width: 90%;
     max-width: 480px;
-    max-height: 390px;
     padding: 24px;
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-lg);
     transform: translateY(-20px);
-    transition: transform 0.3s ease, opacity 0.3s ease, height 0.3s ease;
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease, min-height 0.3s ease;
 }
 
 /* Classe para quando o PDF está selecionado */
 .container__modal-pdf.pdf-selected {
-    min-height: 350px; /* Altura aumentada */
+    min-height: 350px;
 }
 
-.container__modal-pdf.active .container__modal-pdf{
+.container__principal__modal__pdf.active .container__modal-pdf {
     transform: translateY(0);
     opacity: 1;
 }
@@ -52,6 +52,7 @@
     text-align: center;
     font-size: 1.5rem;
     color: var(--cor-black);
+    margin-bottom: 12px;
 }
 
 .upload-area {
@@ -59,19 +60,26 @@
     border-radius: 10px;
     padding: 40px 20px;
     text-align: center;
-    color: #999;
+    color: #64748b;
     cursor: pointer;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+    word-break: break-word;
 }
 
 .upload-area.disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
+    opacity: 0.75;
+    cursor: default;
     pointer-events: none;
+    background-color: #f8fafc;
+    border-color: var(--cor-primaria);
+    color: var(--cor-text-primary);
+    font-weight: 500;
 }
 
 .upload-area:hover {
     background-color: #f9f9f9;
+    border-color: var(--cor-primaria);
 }
 
 #fileInput {
@@ -86,11 +94,18 @@
     width: 100%;
     border-radius: 8px;
     font-size: 16px;
+    font-weight: 500;
     cursor: pointer;
+    transition: background-color 0.2s ease, opacity 0.2s ease;
 }
 
-.btn__gerar__nota:hover {
+.btn__gerar__nota:hover:not(:disabled) {
     background-color: var(--cor-primaria-hover);
+}
+
+.btn__gerar__nota:disabled {
+    opacity: 0.7;
+    cursor: wait;
 }
 
 .close-btn {
@@ -106,39 +121,49 @@
     color: var(--cor-text-primary);
 }
 
-/*icon upload*/
+/* icon upload */
 .fa-arrow-up-from-bracket {
     align-self: center;
-    font-size: 1.25rem;
-    color: var(--cor-text-secondary);
+    font-size: 1.5rem;
+    color: var(--cor-primaria);
     padding: 4px;
     transition: color 0.2s ease;
-    margin-top: 8px;
+    margin-top: 4px;
+    margin-bottom: 4px;
 }
-/*visualizar PDF*/
+
+/* visualizar PDF */
 #pdfActions {
     display: flex;
     justify-content: space-between;
     gap: 10px;
-    margin: 15px 0;
+    margin: 12px 0;
+}
+
+.btn__visualizar__pdf,
+.btn__remover__pdf {
+    flex: 1;
+    color: white;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
 }
 
 .btn__visualizar__pdf {
     background: var(--cor-primaria);
-    color: white;
-    padding: 8px 40px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
 }
 
 .btn__remover__pdf {
-    background: #f44336;
-    color: white;
-    padding: 8px 40px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+    background: #ef4444;
+}
+
+.btn__visualizar__pdf:hover,
+.btn__remover__pdf:hover {
+    opacity: 0.9;
 }
 
 .hidden {
@@ -159,5 +184,4 @@
     .btn__gerar__nota {
         font-size: 14px;
     }
-    
 }
