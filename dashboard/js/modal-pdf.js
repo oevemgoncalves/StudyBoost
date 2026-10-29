@@ -3,6 +3,21 @@ import { createNote } from '../../firebase-service.js';
 import { activeFolderId, currentUserUid } from './folders.js';
 import { renderNotes } from './notes.js';
 
+const RENDER_API_URL = "https://studyboost-backend.onrender.com";
+const LOCAL_API_URL = "http://127.0.0.1:8000";
+
+async function fetchBackend(endpoint, options) {
+    const isLocalhost = ["127.0.0.1", "localhost"].includes(window.location.hostname);
+    if (isLocalhost) {
+        try {
+            return await fetch(`${LOCAL_API_URL}${endpoint}`, options);
+        } catch (err) {
+            console.info("Back-end local não detectado na porta 8000, usando servidor Render...");
+        }
+    }
+    return await fetch(`${RENDER_API_URL}${endpoint}`, options);
+}
+
 let modalPdfInitialized = false;
 
 function initModalPdf() {
@@ -185,7 +200,7 @@ function initModalPdf() {
 
             // 2. Chamada para o back-end com a URL do PDF
             gerarNotaBtn.textContent = '2/3 Gerando resumo com IA... 🧠';
-            const resumoRes = await fetch("https://studyboost-backend.onrender.com/gerar-resumo", {
+            const resumoRes = await fetchBackend("/gerar-resumo", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -214,7 +229,7 @@ function initModalPdf() {
             let quiz = [];
 
             try {
-                const flashQuizRes = await fetch("https://studyboost-backend.onrender.com/gerar-flashcards-e-quiz", {
+                const flashQuizRes = await fetchBackend("/gerar-flashcards-e-quiz", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"

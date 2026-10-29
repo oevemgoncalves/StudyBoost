@@ -355,13 +355,28 @@ async function gerarEAbrirAudio() {
   audioSection.innerHTML = '<p style="margin: auto; font-size: 1.1rem;">Gerando áudio da nota... ⏳</p>';
 
   try {
-    const response = await fetch('https://studyboost-backend.onrender.com/gerar-audio', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ texto: plainText })
-    });
+    const isLocalhost = ["127.0.0.1", "localhost"].includes(window.location.hostname);
+    let response;
+    if (isLocalhost) {
+      try {
+        response = await fetch('http://127.0.0.1:8000/gerar-audio', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ texto: plainText })
+        });
+      } catch (e) {
+        response = null;
+      }
+    }
+    if (!response) {
+      response = await fetch('https://studyboost-backend.onrender.com/gerar-audio', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ texto: plainText })
+      });
+    }
 
     if (!response.ok) {
       throw new Error(`Erro ao gerar áudio: ${response.status}`);

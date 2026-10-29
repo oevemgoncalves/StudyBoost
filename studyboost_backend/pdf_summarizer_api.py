@@ -51,6 +51,27 @@ def read_root():
 # 🔐 chave da API do Gemini (Google AI)
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
+# Lista de modelos em ordem de preferência (com fallback automático caso algum seja descontinuado)
+GEMINI_MODELS = [
+    os.getenv("GEMINI_MODEL", "models/gemini-3.8-flash"),
+    "models/gemini-2.5-flash",
+    "models/gemini-flash-latest",
+]
+
+def generate_with_gemini(prompt: str):
+    last_error = None
+    for model_name in GEMINI_MODELS:
+        try:
+            model = genai.GenerativeModel(model_name)
+            return model.generate_content(prompt)
+        except Exception as e:
+            last_error = e
+            if "404" in str(e) or "not found" in str(e).lower() or "no longer available" in str(e).lower():
+                print(f"⚠️ Modelo {model_name} indisponível, tentando próximo fallback...")
+                continue
+            raise e
+    raise last_error
+
 # Modelo da requisição esperada
 class PDFRequest(BaseModel):
     pdf_url: str
@@ -85,8 +106,7 @@ async def gerar_resumo(req: PDFRequest):
             raise HTTPException(status_code=400, detail="PDF está vazio ou não contém texto extraível")
 
         # 💡 Solicita resumo à IA Gemini
-        model = genai.GenerativeModel("models/gemini-2.0-flash")
-        response = model.generate_content(f"Resuma o conteúdo abaixo de forma clara e organizada para estudo:\n\n{texto}")
+        response = generate_with_gemini(f"Resuma o conteúdo abaixo de forma clara e organizada para estudo:\n\n{texto}")
 
         texto_bruto = response.candidates[0].content.parts[0].text
 
@@ -200,8 +220,7 @@ async def gerar_flashcards_e_quiz(req: ResumoRequest):
         {req.resumo}
         """
 
-        model = genai.GenerativeModel("models/gemini-2.0-flash")
-        response = model.generate_content(prompt)
+        response = generate_with_gemini(prompt)
 
         raw_text = response.candidates[0].content.parts[0].text
 
